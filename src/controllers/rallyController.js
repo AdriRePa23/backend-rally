@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const Rally = require("../models/Rally");
 
 const createRally = async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, cantidad_fotos_max } = req.body;
@@ -8,12 +8,18 @@ const createRally = async (req, res) => {
     }
 
     try {
-        const [result] = await pool.query(
-            "INSERT INTO rallies (nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, creador_id, cantidad_fotos_max) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [nombre, descripcion, fecha_inicio, fecha_fin, categorias, "activo", req.user.id, cantidad_fotos_max]
-        );
+        const rallyId = await Rally.create({
+            nombre,
+            descripcion,
+            fecha_inicio,
+            fecha_fin,
+            categorias,
+            estado: "activo",
+            creador_id: req.user.id,
+            cantidad_fotos_max,
+        });
 
-        res.status(201).json({ message: "Rally creado correctamente", rallyId: result.insertId });
+        res.status(201).json({ message: "Rally creado correctamente", rallyId });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error al crear el rally" });
@@ -22,7 +28,7 @@ const createRally = async (req, res) => {
 
 const getRallies = async (req, res) => {
     try {
-        const [rallies] = await pool.query("SELECT * FROM rallies");
+        const rallies = await Rally.findAll();
         res.status(200).json(rallies);
     } catch (error) {
         console.error(error);
@@ -35,19 +41,24 @@ const updateRally = async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, cantidad_fotos_max } = req.body;
 
     try {
-        const [rally] = await pool.query("SELECT * FROM rallies WHERE id = ?", [id]);
-        if (rally.length === 0) {
+        const rally = await Rally.findById(id);
+        if (!rally) {
             return res.status(404).json({ message: "Rally no encontrado" });
         }
 
-        if (rally[0].creador_id !== req.user.id && req.user.rol_id !== 2) {
+        if (rally.creador_id !== req.user.id && req.user.rol_id !== 2) {
             return res.status(403).json({ message: "No tienes permiso para modificar este rally" });
         }
 
-        await pool.query(
-            "UPDATE rallies SET nombre = ?, descripcion = ?, fecha_inicio = ?, fecha_fin = ?, categorias = ?, estado = ?, cantidad_fotos_max = ? WHERE id = ?",
-            [nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, cantidad_fotos_max, id]
-        );
+        await Rally.update(id, {
+            nombre,
+            descripcion,
+            fecha_inicio,
+            fecha_fin,
+            categorias,
+            estado,
+            cantidad_fotos_max,
+        });
 
         res.status(200).json({ message: "Rally actualizado correctamente" });
     } catch (error) {
@@ -60,16 +71,16 @@ const deleteRally = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const [rally] = await pool.query("SELECT * FROM rallies WHERE id = ?", [id]);
-        if (rally.length === 0) {
+        const rally = await Rally.findById(id);
+        if (!rally) {
             return res.status(404).json({ message: "Rally no encontrado" });
         }
 
-        if (rally[0].creador_id !== req.user.id && req.user.rol_id !== 2) {
+        if (rally.creador_id !== req.user.id && req.user.rol_id !== 2) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este rally" });
         }
 
-        await pool.query("DELETE FROM rallies WHERE id = ?", [id]);
+        await Rally.delete(id);
 
         res.status(200).json({ message: "Rally eliminado correctamente" });
     } catch (error) {
