@@ -3,6 +3,10 @@ const pool = require("../config/db");
 const createRally = async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias } = req.body;
 
+    if (!nombre || !fecha_inicio || !fecha_fin) {
+        return res.status(400).json({ message: "Todos los campos obligatorios deben ser completados" });
+    }
+
     try {
         const [result] = await pool.query(
             "INSERT INTO rallies (nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, creador_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -73,3 +77,5 @@ const deleteRally = async (req, res) => {
         res.status(500).json({ message: "Error al eliminar el rally" });
     }
 };
+
+module.exports = { createRally, getRallies, updateRally, deleteRally };

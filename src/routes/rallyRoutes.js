@@ -1,12 +1,7 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
 const { protect } = require("../middlewares/authMiddleware");
-const {
-    createRally,
-    getRallies,
-    updateRally,
-    deleteRally,
-} = require("../controllers/rallyController");
+const { createRally, getRallies, updateRally, deleteRally } = require("../controllers/rallyController");
 
 const router = express.Router();
 
