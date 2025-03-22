@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const rallyRoutes = require("./routes/rallyRoutes");
+const publicacionRoutes = require("./routes/publicacionRoutes");
 
 dotenv.config();
 
@@ -15,6 +16,9 @@ app.use("/api/auth", authRoutes);
 
 // Rutas de rallies
 app.use("/api/rallies", rallyRoutes);
+
+// Rutas de publicaciones
+app.use("/api/publicaciones", publicacionRoutes);
 
 app.get("/", (req, res) => {
     res.send("¡Bienvenido a la API del Rally Fotográfico!");
