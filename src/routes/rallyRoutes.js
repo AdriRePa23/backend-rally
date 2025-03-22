@@ -1,11 +1,16 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
 const { protect } = require("../middlewares/authMiddleware");
-const { createRally, getRallies, updateRally, deleteRally } = require("../controllers/rallyController");
+const {
+    createRally,
+    getRallies,
+    updateRally,
+    deleteRally,
+} = require("../controllers/rallyController");
 
 const router = express.Router();
 
-// Crear un rally (solo usuarios autenticados)
+// Crear un rally
 router.post(
     "/",
     protect,
@@ -25,6 +30,9 @@ router.post(
         check("categorias", "Las categorías deben tener un máximo de 255 caracteres")
             .optional()
             .isLength({ max: 255 }),
+        check("cantidad_fotos_max", "La cantidad máxima de fotos debe ser un número entero positivo")
+            .notEmpty()
+            .isInt({ min: 1 }),
     ],
     (req, res, next) => {
         const errors = validationResult(req);
@@ -39,7 +47,7 @@ router.post(
 // Listar todos los rallies
 router.get("/", getRallies);
 
-// Modificar un rally (solo el creador o administradores)
+// Modificar un rally
 router.put(
     "/:id",
     protect,
@@ -62,6 +70,9 @@ router.put(
         check("estado", "El estado debe ser 'activo' o 'finalizado'")
             .optional()
             .isIn(["activo", "finalizado"]),
+        check("cantidad_fotos_max", "La cantidad máxima de fotos debe ser un número entero positivo")
+            .optional()
+            .isInt({ min: 1 }),
     ],
     (req, res, next) => {
         const errors = validationResult(req);

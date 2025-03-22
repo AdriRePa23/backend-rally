@@ -1,16 +1,16 @@
 const pool = require("../config/db");
 
 const createRally = async (req, res) => {
-    const { nombre, descripcion, fecha_inicio, fecha_fin, categorias } = req.body;
+    const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, cantidad_fotos_max } = req.body;
 
-    if (!nombre || !fecha_inicio || !fecha_fin) {
+    if (!nombre || !fecha_inicio || !fecha_fin || !cantidad_fotos_max) {
         return res.status(400).json({ message: "Todos los campos obligatorios deben ser completados" });
     }
 
     try {
         const [result] = await pool.query(
-            "INSERT INTO rallies (nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, creador_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [nombre, descripcion, fecha_inicio, fecha_fin, categorias, "activo", req.user.id]
+            "INSERT INTO rallies (nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, creador_id, cantidad_fotos_max) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [nombre, descripcion, fecha_inicio, fecha_fin, categorias, "activo", req.user.id, cantidad_fotos_max]
         );
 
         res.status(201).json({ message: "Rally creado correctamente", rallyId: result.insertId });
@@ -32,7 +32,7 @@ const getRallies = async (req, res) => {
 
 const updateRally = async (req, res) => {
     const { id } = req.params;
-    const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado } = req.body;
+    const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, cantidad_fotos_max } = req.body;
 
     try {
         const [rally] = await pool.query("SELECT * FROM rallies WHERE id = ?", [id]);
@@ -45,8 +45,8 @@ const updateRally = async (req, res) => {
         }
 
         await pool.query(
-            "UPDATE rallies SET nombre = ?, descripcion = ?, fecha_inicio = ?, fecha_fin = ?, categorias = ?, estado = ? WHERE id = ?",
-            [nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, id]
+            "UPDATE rallies SET nombre = ?, descripcion = ?, fecha_inicio = ?, fecha_fin = ?, categorias = ?, estado = ?, cantidad_fotos_max = ? WHERE id = ?",
+            [nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, cantidad_fotos_max, id]
         );
 
         res.status(200).json({ message: "Rally actualizado correctamente" });
