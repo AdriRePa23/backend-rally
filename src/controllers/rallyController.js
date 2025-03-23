@@ -41,23 +41,26 @@ const updateRally = async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, cantidad_fotos_max } = req.body;
 
     try {
+        // Verificar si el rally existe
         const rally = await Rally.findById(id);
         if (!rally) {
             return res.status(404).json({ message: "Rally no encontrado" });
         }
 
+        // Verificar permisos (solo el creador o un administrador puede modificar)
         if (rally.creador_id !== req.user.id && req.user.rol_id !== 2) {
             return res.status(403).json({ message: "No tienes permiso para modificar este rally" });
         }
 
+        // Actualizar el rally con los valores enviados o mantener los valores actuales
         await Rally.update(id, {
-            nombre,
-            descripcion,
-            fecha_inicio,
-            fecha_fin,
-            categorias,
-            estado,
-            cantidad_fotos_max,
+            nombre: nombre || rally.nombre,
+            descripcion: descripcion || rally.descripcion,
+            fecha_inicio: fecha_inicio || rally.fecha_inicio,
+            fecha_fin: fecha_fin || rally.fecha_fin,
+            categorias: categorias || rally.categorias,
+            estado: estado || rally.estado,
+            cantidad_fotos_max: cantidad_fotos_max || rally.cantidad_fotos_max,
         });
 
         res.status(200).json({ message: "Rally actualizado correctamente" });
