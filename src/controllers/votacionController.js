@@ -1,4 +1,5 @@
 const Votacion = require("../models/Votacion");
+const Publicacion = require("../models/Publicacion"); 
 
 const createVotacion = async (req, res) => {
     const { publicacion_id } = req.body;
@@ -8,6 +9,12 @@ const createVotacion = async (req, res) => {
     }
 
     try {
+        // Verificar si la publicación existe
+        const publicacion = await Publicacion.findById(publicacion_id);
+        if (!publicacion) {
+            return res.status(404).json({ message: "La publicación no existe" });
+        }
+
         const ip = req.ip; // Obtener la IP del cliente
         const usuario_id = req.user ? req.user.id : null; // Si el usuario está autenticado
 
