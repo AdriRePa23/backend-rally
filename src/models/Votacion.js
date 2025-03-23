@@ -2,9 +2,9 @@ const pool = require("../config/db");
 
 const Votacion = {
     create: async (data) => {
-        const { ip, publicacion_id, usuario_id } = data;
+        const { ip, publicacion_id} = data;
         const [result] = await pool.query(
-            "INSERT INTO votaciones (ip, publicacion_id, usuario_id) VALUES (?, ?, ?)",
+            "INSERT INTO votaciones (ip, publicacion_id) VALUES (?, ?)",
             [ip, publicacion_id, usuario_id]
         );
         return result.insertId;
@@ -15,13 +15,6 @@ const Votacion = {
         return rows;
     },
 
-    findByUserAndPublicacion: async (usuario_id, publicacion_id) => {
-        const [rows] = await pool.query(
-            "SELECT * FROM votaciones WHERE usuario_id = ? AND publicacion_id = ?",
-            [usuario_id, publicacion_id]
-        );
-        return rows[0];
-    },
 
     findByIpAndPublicacion: async (ip, publicacion_id) => {
         const [rows] = await pool.query(
