@@ -1,5 +1,5 @@
 const express = require("express");
-const optionalAuth = require("../middlewares/optionalAuth");
+const optionalAuth = require("../middlewares/optionalAuthMiddleware");
 const { createVotacion, getVotosByPublicacion } = require("../controllers/votacionController");
 
 const router = express.Router();
