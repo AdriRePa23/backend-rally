@@ -18,7 +18,7 @@ const createVotacion = async (req, res) => {
         
 
         // Crear el voto
-        await Votacion.create({ ip, publicacion_id, usuario_id });
+        await Votacion.create({ ip, publicacion_id});
 
         res.status(201).json({ message: "Voto registrado correctamente" });
     } catch (error) {
