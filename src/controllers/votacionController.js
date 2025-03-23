@@ -9,16 +9,20 @@ const createVotacion = async (req, res) => {
 
     try {
         const ip = req.ip; // Obtener la IP del cliente
-    
-        // Verificar si ya votó (IP)
-        const existingVote = await Votacion.findByIpAndPublicacion(ip, publicacion_id);
-        if (existingVote) {
-            return res.status(400).json({ message: "Ya has votado por esta publicación desde esta IP" });
+        const usuario_id = req.user ? req.user.id : null; // Si el usuario está autenticado
+
+        // Verificar si ya votó (por usuario o IP)
+        const existingVoteByIp = await Votacion.findByIpAndPublicacion(ip, publicacion_id);
+        const existingVoteByUser = usuario_id
+            ? await Votacion.findByUserAndPublicacion(usuario_id, publicacion_id)
+            : null;
+
+        if (existingVoteByIp || existingVoteByUser) {
+            return res.status(400).json({ message: "Ya has votado por esta publicación" });
         }
-        
 
         // Crear el voto
-        await Votacion.create({ ip, publicacion_id});
+        await Votacion.create({ ip, publicacion_id, usuario_id });
 
         res.status(201).json({ message: "Voto registrado correctamente" });
     } catch (error) {
