@@ -12,7 +12,17 @@ const Comentario = {
 
     findAllByPublicacionId: async (publicacion_id) => {
         const [rows] = await pool.query(
-            "SELECT c.id, c.comentario, c.created_at, u.nombre AS usuario_nombre, u.foto_perfil AS usuario_foto FROM comentarios c JOIN usuarios u ON c.usuario_id = u.id WHERE c.publicacion_id = ? ORDER BY c.created_at DESC",
+            `SELECT 
+                c.id, 
+                c.comentario, 
+                c.created_at, 
+                c.usuario_id, 
+                u.nombre AS usuario_nombre, 
+                u.foto_perfil AS usuario_foto 
+            FROM comentarios c 
+            JOIN usuarios u ON c.usuario_id = u.id 
+            WHERE c.publicacion_id = ? 
+            ORDER BY c.created_at DESC`,
             [publicacion_id]
         );
         return rows;
