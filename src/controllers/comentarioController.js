@@ -57,8 +57,18 @@ const deleteComentario = async (req, res) => {
             return res.status(404).json({ message: "El comentario no existe" });
         }
 
+        // Verificar si la publicación asociada al comentario existe
+        const publicacion = await Publicacion.findById(comentario.publicacion_id);
+        if (!publicacion) {
+            return res.status(404).json({ message: "La publicación asociada al comentario no existe" });
+        }
+
         // Verificar si el usuario tiene permiso para eliminar el comentario
-        if (comentario.usuario_id !== req.user.id && req.user.rol_id !== 2) {
+        if (
+            comentario.usuario_id !== req.user.id && // No es el dueño del comentario
+            req.user.rol_id !== 2 && // No es administrador
+            publicacion.creador_id !== req.user.id // No es el creador de la publicación
+        ) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este comentario" });
         }
 
