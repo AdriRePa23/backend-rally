@@ -37,15 +37,13 @@ const Rally = {
     const [rallies] = await pool.query("SELECT * FROM rallies");
     const ralliesConImagen = await Promise.all(
         rallies.map(async (rally) => {
-            // Consulta para obtener la imagen más votada o la primera imagen publicada
-            const [imagenMasVotada] = await pool.query(
+            // Consulta para obtener la primera imagen publicada en el rally
+            const [primeraImagen] = await pool.query(
                 `
-                SELECT p.fotografia, COUNT(v.id) AS votos
+                SELECT p.fotografia
                 FROM publicaciones p
-                LEFT JOIN votaciones v ON p.id = v.publicacion_id
                 WHERE p.rally_id = ?
-                GROUP BY p.id
-                ORDER BY votos DESC, p.fecha_publicacion ASC
+                ORDER BY p.fecha_publicacion ASC
                 LIMIT 1
                 `,
                 [rally.id]
@@ -54,7 +52,7 @@ const Rally = {
             // Si no hay imágenes asociadas al rally, devuelve null
             return {
                 ...rally,
-                imagenMasVotada: imagenMasVotada[0]?.fotografia || null,
+                imagen: primeraImagen[0]?.fotografia || null,
             };
         })
     );
