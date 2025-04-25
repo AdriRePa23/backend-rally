@@ -39,34 +39,8 @@ const getRallies = async (req, res) => {
 const getRalliesConImagen = async (req, res) => {
     try {
         // Consulta para obtener todos los rallies
-        const [rallies] = await pool.query("SELECT * FROM rallies");
-
-        // Iterar sobre cada rally para obtener la imagen más votada
-        const ralliesConImagen = await Promise.all(
-            rallies.map(async (rally) => {
-                // Consulta para obtener la imagen más votada del rally
-                const [imagenMasVotada] = await pool.query(
-                    `
-                    SELECT p.imagen_url, COUNT(v.id) AS votos
-                    FROM publicaciones p
-                    LEFT JOIN votaciones v ON p.id = v.publicacion_id
-                    WHERE p.rally_id = ?
-                    GROUP BY p.id
-                    ORDER BY votos DESC
-                    LIMIT 1
-                    `,
-                    [rally.id]
-                );
-
-                // Agregar la URL de la imagen más votada al rally
-                return {
-                    ...rally,
-                    imagen_mas_votada: imagenMasVotada[0]?.imagen_url || null, // Si no hay imágenes, devuelve null
-                };
-            })
-        );
-
-        res.status(200).json(ralliesConImagen);
+        const [rallies] = await Rally.findAllWithImages();
+        res.status(200).json(rallies);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error al obtener los rallies" });

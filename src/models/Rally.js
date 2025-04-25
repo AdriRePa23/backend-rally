@@ -15,6 +15,28 @@ const Rally = {
         return rows;
     },
 
+    findAllWithImages: async () => {
+        const [rallies] = await pool.query("SELECT * FROM rallies");
+        const ralliesConImagen = await Promise.all(
+            rallies.map(async (rally) => {
+                const [imagenMasVotada] = await pool.query(
+                    `
+                    SELECT p.imagen_url, COUNT(v.id) AS votos
+                    FROM publicaciones p
+                    LEFT JOIN votaciones v ON p.id = v.publicacion_id
+                    WHERE p.rally_id = ?
+                    GROUP BY p.id
+                    ORDER BY votos DESC
+                    LIMIT 1
+                    `,
+                    [rally.id]
+                );
+                return { ...rally, imagenMasVotada: imagenMasVotada[0] };
+            })
+        );
+        return ralliesConImagen;
+    },
+
     findById: async (id) => {
         const [rows] = await pool.query("SELECT * FROM rallies WHERE id = ?", [id]);
         return rows[0];
