@@ -38,8 +38,10 @@ const getRallies = async (req, res) => {
 
 const getRalliesConImagen = async (req, res) => {
     try {
-        // Consulta para obtener todos los rallies
-        const [rallies] = await Rally.findAllWithImages();
+        // Llamar al método findAllWithImages para obtener todos los rallies con sus imágenes
+        const rallies = await Rally.findAllWithImages();
+
+        // Enviar la respuesta con todos los rallies
         res.status(200).json(rallies);
     } catch (error) {
         console.error(error);
