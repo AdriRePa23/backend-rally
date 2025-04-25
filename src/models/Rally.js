@@ -43,7 +43,6 @@ const Rally = {
                 SELECT p.fotografia
                 FROM publicaciones p
                 WHERE p.rally_id = ?
-                ORDER BY p.fecha_publicacion ASC
                 LIMIT 1
                 `,
                 [rally.id]
