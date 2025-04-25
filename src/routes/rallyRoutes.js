@@ -1,6 +1,6 @@
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
-const { createRally, updateRally, deleteRally, getRallies } = require("../controllers/rallyController");
+const { createRally, updateRally, deleteRally, getRallies, getRalliesConImagen } = require("../controllers/rallyController");
 const { check, validationResult } = require("express-validator");
 
 const router = express.Router();
@@ -37,6 +37,9 @@ router.post(
 
 // Listar todos los rallies
 router.get("/", getRallies);
+
+// Listar todos los rallies con imagen mas votada
+router.get("/card", getRalliesConImagen);
 
 // Actualizar un rally
 router.put(
