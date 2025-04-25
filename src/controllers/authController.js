@@ -58,7 +58,7 @@ const loginUser = async (req, res) => {
         const token = jwt.sign(
             { id: user.id, nombre: user.nombre, email: user.email, rol_id: user.rol_id },
             process.env.JWT_SECRET,
-            { expiresIn: "1d" }
+            { expiresIn: "3d" }
         );
 
         res.status(200).json({ message: "Inicio de sesión exitoso", token });
