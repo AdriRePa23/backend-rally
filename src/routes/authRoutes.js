@@ -51,6 +51,12 @@ router.post(
     loginUser
 );
 
-router.post("/verify-token", verifyToken);
+router.post("/verify-token", verifyToken, (req, res) => {
+    // Si el token es válido, `req.user` contendrá los datos del usuario
+    res.status(200).json({
+        message: "Token válido",
+        user: req.user, // Devuelve los datos del usuario decodificados del token
+    });
+});
 
 module.exports = router;
