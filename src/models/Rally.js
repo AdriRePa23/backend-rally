@@ -34,7 +34,10 @@ const Rally = {
   },
 
   findAllWithImages: async () => {
+    // Obtener todos los rallies
     const [rallies] = await pool.query("SELECT * FROM rallies");
+
+    // Procesar cada rally para obtener su primera imagen publicada
     const ralliesConImagen = await Promise.all(
         rallies.map(async (rally) => {
             // Consulta para obtener la primera imagen publicada en el rally
@@ -43,18 +46,21 @@ const Rally = {
                 SELECT p.fotografia
                 FROM publicaciones p
                 WHERE p.rally_id = ?
+                ORDER BY p.created_at ASC
                 LIMIT 1
                 `,
                 [rally.id]
             );
 
-            // Si no hay imágenes asociadas al rally, devuelve null
+            // Retornar el rally con la imagen asociada (o null si no hay imágenes)
             return {
                 ...rally,
                 imagen: primeraImagen[0]?.fotografia || null,
             };
         })
     );
+
+    // Devolver todos los rallies con sus respectivas imágenes
     return ralliesConImagen;
   },
 
