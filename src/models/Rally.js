@@ -21,7 +21,7 @@ const Rally = {
             rallies.map(async (rally) => {
                 const [imagenMasVotada] = await pool.query(
                     `
-                    SELECT p.imagen_url, COUNT(v.id) AS votos
+                    SELECT p.fotografia, COUNT(v.id) AS votos
                     FROM publicaciones p
                     LEFT JOIN votaciones v ON p.id = v.publicacion_id
                     WHERE p.rally_id = ?
