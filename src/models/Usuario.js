@@ -20,12 +20,22 @@ const Usuario = {
         return rows[0];
     },
 
-    update: async (id, data) => {
+    updateData: async (id, data) => {
         const { nombre, email, contrasena, foto_perfil, verificado, rol_id } = data;
         await pool.query(
             "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ?, foto_perfil = ?, verificado = ?, rol_id = ? WHERE id = ?",
             [nombre, email, contrasena, foto_perfil, verificado, rol_id, id]
         );
+    },
+
+    updatePassword: async (id, data) => {
+        const { contrasena } = data;
+        await pool.query("UPDATE usuarios SET contrasena = ? WHERE id = ?", [contrasena, id]);
+    },
+    update: async (id, data) => {
+        const fields = Object.keys(data).map((key) => `${key} = ?`).join(", ");
+        const values = Object.values(data);
+        await pool.query(`UPDATE usuarios SET ${fields} WHERE id = ?`, [...values, id]);
     },
 
     delete: async (id) => {
