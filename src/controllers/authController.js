@@ -69,6 +69,11 @@ const loginUser = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
+        // Verificar si el usuario está verificado
+        if (user.verificado === 0) {
+            return res.status(403).json({ message: "Por favor, verifica tu cuenta antes de iniciar sesión" });
+        }
+
         // Verificar la contraseña
         const isMatch = await bcrypt.compare(password, user.contrasena);
         if (!isMatch) {
