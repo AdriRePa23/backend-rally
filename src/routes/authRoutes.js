@@ -3,6 +3,7 @@ const { check, validationResult } = require("express-validator");
 const { registerUser, loginUser, verifyToken } = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario"); // Asegúrate de que la ruta sea correcta
+const path = require("path");
 
 const router = express.Router();
 
@@ -65,7 +66,7 @@ router.get("/verify-email", async (req, res) => {
     const { token } = req.query;
 
     if (!token) {
-        return res.status(400).json({ message: "Token de verificación no proporcionado" });
+        return res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
     }
 
     try {
@@ -75,10 +76,11 @@ router.get("/verify-email", async (req, res) => {
         // Actualizar el campo "verificado" del usuario
         await Usuario.update(decoded.id, { verificado: 1 });
 
-        res.status(200).json({ message: "Cuenta verificada correctamente" });
+        // Enviar la página HTML de éxito
+        res.sendFile(path.join(__dirname, "../views/verify-success.html"));
     } catch (error) {
         console.error(error);
-        res.status(400).json({ message: "Token de verificación inválido o expirado" });
+        res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
     }
 });
 
