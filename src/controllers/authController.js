@@ -1,7 +1,7 @@
-const Usuario = require("../models/Usuario");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const transporter = require("../config/nodemailer");
+const bcrypt = require("bcrypt");
+const Usuario = require("../models/Usuario"); // Modelo de usuario
+const sendEmail = require("../config/sendgrid"); // Configuración de SendGrid
 
 const registerUser = async (req, res) => {
     const { nombre, email, password } = req.body;
@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
             nombre,
             email,
             contrasena: hashedPassword,
-            rol_id: 1, // Rol por defecto: Participante
+            rol_id: 1, 
             verificado: 0, // Usuario no verificado inicialmente
         });
 
@@ -38,16 +38,15 @@ const registerUser = async (req, res) => {
 
         // Enviar correo de verificación
         const verificationUrl = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Verifica tu cuenta",
-            html: `
+        await sendEmail(
+            email,
+            "Verifica tu cuenta",
+            `
                 <h1>Bienvenido a Rally Fotográfico</h1>
                 <p>Por favor, verifica tu cuenta haciendo clic en el siguiente enlace:</p>
                 <a href="${verificationUrl}">Verificar cuenta</a>
-            `,
-        });
+            `
+        );
 
         res.status(201).json({ message: "Usuario registrado correctamente. Revisa tu correo para verificar tu cuenta." });
     } catch (error) {
