@@ -63,24 +63,20 @@ const loginUser = async (req, res) => {
     }
 
     try {
-        // Buscar el usuario por email
         const user = await Usuario.findByEmail(email);
         if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
-        // Verificar si el usuario está verificado
         if (user.verificado === 0) {
             return res.status(403).json({ message: "Por favor, verifica tu cuenta antes de iniciar sesión" });
         }
 
-        // Verificar la contraseña
         const isMatch = await bcrypt.compare(password, user.contrasena);
         if (!isMatch) {
             return res.status(401).json({ message: "Credenciales incorrectas" });
         }
 
-        // Generar un token JWT
         const token = jwt.sign(
             { id: user.id, nombre: user.nombre, email: user.email, rol_id: user.rol_id },
             process.env.JWT_SECRET,
@@ -89,7 +85,6 @@ const loginUser = async (req, res) => {
 
         res.status(200).json({ message: "Inicio de sesión exitoso", token });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Error al iniciar sesión" });
     }
 };
