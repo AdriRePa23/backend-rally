@@ -42,7 +42,7 @@ const registerUser = async (req, res) => {
             email,
             "Verifica tu cuenta",
             `
-                <h1>Bienvenido a Rally Fotográfico</h1>
+                <h1>Bienvenido a PicMeTogether</h1>
                 <p>Por favor, verifica tu cuenta haciendo clic en el siguiente enlace:</p>
                 <a href="${verificationUrl}">Verificar cuenta</a>
             `
