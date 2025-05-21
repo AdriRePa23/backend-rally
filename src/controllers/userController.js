@@ -18,6 +18,23 @@ const getUserById = async (req, res) => {
     }
 };
 
+// Obtener toda la información privada de un usuario (solo dueño o admin)
+const getUserPrivateInfo = async (req, res) => {
+    const { id } = req.params;
+    try {
+        if (req.user.id !== parseInt(id) && req.user.rol_id !== 1) {
+            return res.status(403).json({ message: "No tienes permiso para ver esta información" });
+        }
+        const user = await Usuario.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener la información privada del usuario" });
+    }
+};
+
 // Actualizar datos de un usuario (solo nombre y foto_perfil)
 const updateUser = async (req, res) => {
     const { id } = req.params;
@@ -91,4 +108,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getUserById, updateUser, deleteUser };
+module.exports = { getUserById, updateUser, deleteUser, getUserPrivateInfo };

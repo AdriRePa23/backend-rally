@@ -47,6 +47,17 @@ const getPublicacionesByRally = async (req, res) => {
     }
 };
 
+// Obtener publicaciones por usuario
+const getPublicacionesByUsuario = async (req, res) => {
+    const { usuario_id } = req.params;
+    try {
+        const publicaciones = await Publicacion.findAllByUsuarioId(usuario_id);
+        res.status(200).json(publicaciones);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener las publicaciones del usuario" });
+    }
+};
+
 const deletePublicacion = async (req, res) => {
     const { id } = req.params;
 
@@ -75,4 +86,4 @@ const deletePublicacion = async (req, res) => {
     }
 };
 
-module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion };
+module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario };

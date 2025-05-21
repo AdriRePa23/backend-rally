@@ -1,6 +1,6 @@
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
-const { createPublicacion, getPublicacionesByRally, deletePublicacion } = require("../controllers/publicacionController");
+const { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario } = require("../controllers/publicacionController");
 const multer = require("multer");
 const { check, validationResult } = require("express-validator");
 
@@ -43,6 +43,9 @@ router.get(
     },
     getPublicacionesByRally
 );
+
+// Obtener publicaciones de un usuario
+router.get("/usuario/:usuario_id", getPublicacionesByUsuario);
 
 // Eliminar una publicación
 router.delete(

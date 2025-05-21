@@ -31,6 +31,11 @@ const Publicacion = {
     delete: async (id) => {
         await pool.query("DELETE FROM publicaciones WHERE id = ?", [id]);
     },
+
+    findAllByUsuarioId: async (usuario_id) => {
+        const [rows] = await pool.query("SELECT * FROM publicaciones WHERE usuario_id = ?", [usuario_id]);
+        return rows;
+    },
 };
 
 module.exports = Publicacion;
