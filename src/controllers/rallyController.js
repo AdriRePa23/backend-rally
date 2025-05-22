@@ -105,4 +105,17 @@ const deleteRally = async (req, res) => {
     }
 };
 
-module.exports = { createRally, getRallies, updateRally, deleteRally, getRalliesConImagen };
+const getRallyById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const rally = await Rally.findById(id);
+        if (!rally) {
+            return res.status(404).json({ message: "Rally no encontrado" });
+        }
+        res.status(200).json(rally);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener el rally" });
+    }
+};
+
+module.exports = { createRally, getRallies, updateRally, deleteRally, getRalliesConImagen, getRallyById };

@@ -1,5 +1,6 @@
 const Publicacion = require("../models/Publicacion");
 const cloudinary = require("../config/cloudinary");
+const Rally = require("../models/Rally");
 
 const createPublicacion = async (req, res) => {
     const { descripcion, rally_id } = req.body;
@@ -9,6 +10,19 @@ const createPublicacion = async (req, res) => {
     }
 
     try {
+        // Comprobar el número máximo de fotos permitidas en el rally
+        const rally = await Rally.findById(rally_id);
+        if (!rally) {
+            return res.status(404).json({ message: "Rally no encontrado" });
+        }
+        const maxFotos = rally.cantidad_fotos_max;
+        // Contar las publicaciones del usuario en este rally
+        const publicacionesUsuario = await Publicacion.findAllByUsuarioId(req.user.id);
+        const publicacionesEnRally = publicacionesUsuario.filter(p => p.rally_id == rally_id);
+        if (publicacionesEnRally.length >= maxFotos) {
+            return res.status(400).json({ message: `No puedes subir más de ${maxFotos} fotos a este rally.` });
+        }
+
         // Subir la imagen a Cloudinary
         const uploadResult = await cloudinary.uploader.upload(req.file.path, {
             folder: "publicaciones", // Carpeta en Cloudinary
@@ -86,4 +100,18 @@ const deletePublicacion = async (req, res) => {
     }
 };
 
-module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario };
+// Obtener una publicación por su id
+const getPublicacionById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const publicacion = await Publicacion.findById(id);
+        if (!publicacion) {
+            return res.status(404).json({ message: "Publicación no encontrada" });
+        }
+        res.status(200).json(publicacion);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener la publicación" });
+    }
+};
+
+module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario, getPublicacionById };
