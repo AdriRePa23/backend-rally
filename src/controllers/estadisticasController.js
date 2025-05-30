@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const Rally = require("../models/Rally");
 
 const getEstadisticas = async (req, res) => {
     try {
@@ -41,4 +42,34 @@ const getEstadisticas = async (req, res) => {
     }
 };
 
-module.exports = { getEstadisticas };
+// Estadísticas de un rally (solo dueño o admin)
+const getEstadisticasRally = async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Obtener el rally y verificar permisos
+        const rally = await Rally.findById(id);
+        if (!rally) {
+            return res.status(404).json({ message: "Rally no encontrado" });
+        }
+        if (req.user.id !== rally.creador_id && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
+            return res.status(403).json({ message: "No tienes permiso para ver las estadísticas de este rally" });
+        }
+        // Estadísticas: total publicaciones, total votos, total participantes, votos por publicación, publicaciones por usuario
+        const [totalPublicaciones] = await pool.query("SELECT COUNT(*) AS total FROM publicaciones WHERE rally_id = ?", [id]);
+        const [totalVotos] = await pool.query(`SELECT COUNT(*) AS total FROM votaciones v JOIN publicaciones p ON v.publicacion_id = p.id WHERE p.rally_id = ?`, [id]);
+        const [participantes] = await pool.query("SELECT COUNT(DISTINCT usuario_id) AS total FROM publicaciones WHERE rally_id = ?", [id]);
+        const [votosPorPublicacion] = await pool.query(`SELECT p.id, p.descripcion, COUNT(v.id) AS votos FROM publicaciones p LEFT JOIN votaciones v ON p.id = v.publicacion_id WHERE p.rally_id = ? GROUP BY p.id ORDER BY votos DESC`, [id]);
+        const [publicacionesPorUsuario] = await pool.query(`SELECT u.id, u.nombre, COUNT(p.id) AS publicaciones FROM usuarios u JOIN publicaciones p ON u.id = p.usuario_id WHERE p.rally_id = ? GROUP BY u.id ORDER BY publicaciones DESC`, [id]);
+        res.status(200).json({
+            total_publicaciones: totalPublicaciones[0].total,
+            total_votos: totalVotos[0].total,
+            total_participantes: participantes[0].total,
+            votos_por_publicacion: votosPorPublicacion,
+            publicaciones_por_usuario: publicacionesPorUsuario
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener estadísticas del rally" });
+    }
+};
+
+module.exports = { getEstadisticas, getEstadisticasRally };

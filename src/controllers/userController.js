@@ -20,11 +20,11 @@ const getUserById = async (req, res) => {
     }
 };
 
-// Obtener toda la información privada de un usuario (solo dueño o admin)
+// Obtener toda la información privada de un usuario (solo dueño, admin o gestor)
 const getUserPrivateInfo = async (req, res) => {
     const { id } = req.params;
     try {
-        if (req.user.id !== parseInt(id) && req.user.rol_id !== 1) {
+        if (req.user.id !== parseInt(id) && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para ver esta información" });
         }
         const user = await Usuario.findById(id);
@@ -37,56 +37,26 @@ const getUserPrivateInfo = async (req, res) => {
     }
 };
 
-// Actualizar datos de un usuario (solo nombre y foto_perfil)
+// Actualizar datos de un usuario (solo dueño, admin o gestor)
 const updateUser = async (req, res) => {
     const { id } = req.params;
+    const data = req.body;
     try {
         const user = await Usuario.findById(id);
         if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
-        // Solo el propio usuario o un admin (rol_id 1) puede modificar
-        if (req.user.id !== parseInt(id) && req.user.rol_id !== 1) {
+        if (req.user.id !== parseInt(id) && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para modificar este usuario" });
         }
-
-        const dataToUpdate = {};
-        // Actualizar nombre si viene en el body
-        if (req.body.nombre) {
-            dataToUpdate.nombre = req.body.nombre;
-        }
-
-        // Actualizar foto de perfil si viene un archivo
-        if (req.file) {
-            // Subir nueva foto a Cloudinary
-            const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-                folder: "usuarios",
-                resource_type: "image",
-            });
-            dataToUpdate.foto_perfil = uploadResult.secure_url;
-
-            // Eliminar archivo local temporal
-            fs.unlinkSync(req.file.path);
-
-            // Eliminar la foto anterior de Cloudinary si existía
-            if (user.foto_perfil) {
-                const publicId = user.foto_perfil.split("/").pop().split(".")[0];
-                await cloudinary.uploader.destroy(`usuarios/${publicId}`);
-            }
-        }
-
-        if (Object.keys(dataToUpdate).length === 0) {
-            return res.status(400).json({ message: "No se proporcionaron datos para actualizar" });
-        }
-
-        await Usuario.update(id, dataToUpdate);
+        await Usuario.update(id, data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });
     } catch (error) {
         res.status(500).json({ message: "Error al actualizar el usuario" });
     }
 };
 
-// Eliminar un usuario
+// Eliminar un usuario (solo dueño, admin o gestor)
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
@@ -94,8 +64,7 @@ const deleteUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
-        // Solo el propio usuario o un admin (rol_id 1) puede eliminar
-        if (req.user.id !== parseInt(id) && req.user.rol_id !== 1) {
+        if (req.user.id !== parseInt(id) && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este usuario" });
         }
         // Eliminar la foto de perfil de Cloudinary si existe
@@ -112,7 +81,7 @@ const deleteUser = async (req, res) => {
 
 // Listar todos los usuarios o buscar por nombre/email (solo admin)
 const listUsers = async (req, res) => {
-    if (req.user.rol_id !== 1) {
+    if (req.user.rol_id !== 2) {
         return res.status(403).json({ message: "No tienes permiso para ver los usuarios" });
     }
     const { search, limit = 20, page = 1 } = req.query;
@@ -142,12 +111,12 @@ const getMe = async (req, res) => {
     }
 };
 
-// Actualizar contraseña de usuario (solo dueño o admin)
+// Actualizar contraseña de usuario (solo dueño, admin o gestor)
 const updatePassword = async (req, res) => {
     const { id } = req.params;
     const { nuevaContrasena } = req.body;
     try {
-        if (req.user.id !== parseInt(id) && req.user.rol_id !== 1) {
+        if (req.user.id !== parseInt(id) && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para cambiar la contraseña de este usuario" });
         }
         if (!nuevaContrasena || nuevaContrasena.length < 6) {
@@ -184,4 +153,165 @@ const getUserStats = async (req, res) => {
     }
 };
 
-module.exports = { getUserById, updateUser, deleteUser, getUserPrivateInfo, listUsers, getMe, updatePassword, getUserStats };
+// Crear administrador (solo admin)
+const createAdmin = async (req, res) => {
+    if (req.user.rol_id !== 2) {
+        return res.status(403).json({ message: "Solo un administrador puede crear administradores" });
+    }
+    const { nombre, email, contrasena } = req.body;
+    try {
+        if (!nombre || !email || !contrasena) {
+            return res.status(400).json({ message: "Todos los campos son obligatorios" });
+        }
+        const hashed = await bcrypt.hash(contrasena, 10);
+        const adminId = await Usuario.createAdmin({ nombre, email, contrasena: hashed, rol_id: 1 });
+        res.status(201).json({ message: "Administrador creado correctamente", adminId });
+    } catch (error) {
+        res.status(500).json({ message: "Error al crear el administrador" });
+    }
+};
+
+// Crear gestor (solo admin)
+const createGestor = async (req, res) => {
+    if (req.user.rol_id !== 2) {
+        return res.status(403).json({ message: "Solo un administrador puede crear gestores" });
+    }
+    const { nombre, email, contrasena } = req.body;
+    try {
+        if (!nombre || !email || !contrasena) {
+            return res.status(400).json({ message: "Todos los campos son obligatorios" });
+        }
+        const hashed = await bcrypt.hash(contrasena, 10);
+        const gestorId = await Usuario.createAdmin({ nombre, email, contrasena: hashed, rol_id: 3 });
+        res.status(201).json({ message: "Gestor creado correctamente", gestorId });
+    } catch (error) {
+        res.status(500).json({ message: "Error al crear el gestor" });
+    }
+};
+
+// Obtener administrador por id
+const getAdminById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const admin = await Usuario.findAdminById(id);
+        if (!admin) {
+            return res.status(404).json({ message: "Administrador no encontrado" });
+        }
+        res.status(200).json(admin);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener el administrador" });
+    }
+};
+
+// Actualizar administrador
+const updateAdmin = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, email, contrasena } = req.body;
+    try {
+        const admin = await Usuario.findAdminById(id);
+        if (!admin) {
+            return res.status(404).json({ message: "Administrador no encontrado" });
+        }
+        let hashed = admin.contrasena;
+        if (contrasena) {
+            hashed = await bcrypt.hash(contrasena, 10);
+        }
+        await Usuario.updateAdmin(id, { nombre: nombre || admin.nombre, email: email || admin.email, contrasena: hashed });
+        res.status(200).json({ message: "Administrador actualizado correctamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al actualizar el administrador" });
+    }
+};
+
+// Eliminar administrador
+const deleteAdmin = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const admin = await Usuario.findAdminById(id);
+        if (!admin) {
+            return res.status(404).json({ message: "Administrador no encontrado" });
+        }
+        await Usuario.deleteAdmin(id);
+        res.status(200).json({ message: "Administrador eliminado correctamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al eliminar el administrador" });
+    }
+};
+
+// Listar gestores (solo admin)
+const listGestores = async (req, res) => {
+    if (req.user.rol_id !== 2) {
+        return res.status(403).json({ message: "Solo un administrador puede ver los gestores" });
+    }
+    try {
+        const pool = require("../config/db");
+        const [gestores] = await pool.query("SELECT id, nombre, email, rol_id FROM usuarios WHERE rol_id = 3");
+        res.status(200).json(gestores);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener los gestores" });
+    }
+};
+
+// Obtener gestor por id (solo admin)
+const getGestorById = async (req, res) => {
+    if (req.user.rol_id !== 2) {
+        return res.status(403).json({ message: "Solo un administrador puede ver los gestores" });
+    }
+    const { id } = req.params;
+    try {
+        const pool = require("../config/db");
+        const [gestores] = await pool.query("SELECT id, nombre, email, rol_id FROM usuarios WHERE id = ? AND rol_id = 3", [id]);
+        if (!gestores[0]) {
+            return res.status(404).json({ message: "Gestor no encontrado" });
+        }
+        res.status(200).json(gestores[0]);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener el gestor" });
+    }
+};
+
+// Actualizar gestor (solo admin)
+const updateGestor = async (req, res) => {
+    if (req.user.rol_id !== 2) {
+        return res.status(403).json({ message: "Solo un administrador puede actualizar gestores" });
+    }
+    const { id } = req.params;
+    const { nombre, email, contrasena } = req.body;
+    try {
+        const pool = require("../config/db");
+        const [gestores] = await pool.query("SELECT * FROM usuarios WHERE id = ? AND rol_id = 3", [id]);
+        if (!gestores[0]) {
+            return res.status(404).json({ message: "Gestor no encontrado" });
+        }
+        let hashed = gestores[0].contrasena;
+        if (contrasena) {
+            const bcrypt = require("bcrypt");
+            hashed = await bcrypt.hash(contrasena, 10);
+        }
+        await pool.query("UPDATE usuarios SET nombre = ?, email = ?, contrasena = ? WHERE id = ? AND rol_id = 3", [nombre || gestores[0].nombre, email || gestores[0].email, hashed, id]);
+        res.status(200).json({ message: "Gestor actualizado correctamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al actualizar el gestor" });
+    }
+};
+
+// Eliminar gestor (solo admin)
+const deleteGestor = async (req, res) => {
+    if (req.user.rol_id !== 2) {
+        return res.status(403).json({ message: "Solo un administrador puede eliminar gestores" });
+    }
+    const { id } = req.params;
+    try {
+        const pool = require("../config/db");
+        const [gestores] = await pool.query("SELECT * FROM usuarios WHERE id = ? AND rol_id = 3", [id]);
+        if (!gestores[0]) {
+            return res.status(404).json({ message: "Gestor no encontrado" });
+        }
+        await pool.query("DELETE FROM usuarios WHERE id = ? AND rol_id = 3", [id]);
+        res.status(200).json({ message: "Gestor eliminado correctamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al eliminar el gestor" });
+    }
+};
+
+module.exports = { getUserById, updateUser, deleteUser, getUserPrivateInfo, listUsers, getMe, updatePassword, getUserStats, createAdmin, createGestor, getAdminById, updateAdmin, deleteAdmin, listGestores, getGestorById, updateGestor, deleteGestor };

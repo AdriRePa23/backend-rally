@@ -103,14 +103,12 @@ const getPublicacionesByRallyOrderByVotos = async (req, res) => {
 
 const deletePublicacion = async (req, res) => {
     const { id } = req.params;
-
     try {
         const publicacion = await Publicacion.findById(id);
         if (!publicacion) {
             return res.status(404).json({ message: "Publicación no encontrada" });
         }
-
-        if (publicacion.usuario_id !== req.user.id && req.user.rol_id !== 2) {
+        if (publicacion.usuario_id !== req.user.id && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para eliminar esta publicación" });
         }
 

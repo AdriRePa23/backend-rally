@@ -57,6 +57,29 @@ const Usuario = {
         const [rows] = await pool.query(query, params);
         return rows;
     },
+
+    createAdmin: async (data) => {
+        const { nombre, email, contrasena, rol_id } = data;
+        const [result] = await pool.query(
+            "INSERT INTO usuarios (nombre, email, contrasena, rol_id) VALUES (?, ?, ?, ?)",
+            [nombre, email, contrasena, rol_id]
+        );
+        return result.insertId;
+    },
+    findAdminById: async (id) => {
+        const [rows] = await pool.query("SELECT id, nombre, email, rol_id FROM usuarios WHERE id = ? AND rol_id = 1", [id]);
+        return rows[0];
+    },
+    updateAdmin: async (id, data) => {
+        const { nombre, email, contrasena } = data;
+        await pool.query(
+            "UPDATE usuarios SET nombre = ?, email = ?, contrasena = ? WHERE id = ? AND rol_id = 1",
+            [nombre, email, contrasena, id]
+        );
+    },
+    deleteAdmin: async (id) => {
+        await pool.query("DELETE FROM usuarios WHERE id = ? AND rol_id = 1", [id]);
+    },
 };
 
 module.exports = Usuario;

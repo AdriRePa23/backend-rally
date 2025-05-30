@@ -78,7 +78,8 @@ const deleteComentario = async (req, res) => {
         if (
             comentario.usuario_id !== req.user.id && // No es el dueño del comentario
             req.user.rol_id !== 2 && // No es administrador
-            publicacion.creador_id !== req.user.id // No es el creador de la publicación
+            publicacion.creador_id !== req.user.id && // No es el creador de la publicación
+            req.user.rol_id !== 3 // No es gestor
         ) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este comentario" });
         }
