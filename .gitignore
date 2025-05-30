@@ -3,6 +3,7 @@ node_modules/
 .env
 *.log
 backend-rally.postman_collection.json
+endpoints_respuestas.md
 
 # Logs
 npm-debug.log*
