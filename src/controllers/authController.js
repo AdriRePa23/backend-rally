@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Usuario = require("../models/Usuario");
 const sendEmail = require("../config/sendgrid");
+const crypto = require("crypto");
 
 const registerUser = async (req, res) => {
     const { nombre, email, password } = req.body;
@@ -137,5 +138,61 @@ const resendVerification = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, verifyToken, resendVerification };
+// Solicitar recuperación de contraseña
+const requestPasswordReset = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "El email es obligatorio" });
+    }
+    try {
+        const user = await Usuario.findByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        // Generar token único y temporal
+        const token = crypto.randomBytes(32).toString("hex");
+        const expires = Date.now() + 1000 * 60 * 30; // 30 minutos
+        // Guardar token y expiración en memoria (ideal: en BD, aquí simple)
+        if (!global.passwordResetTokens) global.passwordResetTokens = {};
+        global.passwordResetTokens[token] = { userId: user.id, expires };
+        // Enviar email con enlace
+        const resetUrl = `http://localhost:3000/api/auth/reset-password?token=${token}`;
+        await sendEmail(
+            email,
+            "Recupera tu contraseña",
+            `<p>Haz clic en el siguiente enlace para restablecer tu contraseña (válido 30 minutos):</p><a href="${resetUrl}">${resetUrl}</a>`
+        );
+        res.status(200).json({ message: "Correo de recuperación enviado" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al solicitar recuperación de contraseña" });
+    }
+};
+
+// Restablecer contraseña
+const resetPassword = async (req, res) => {
+    const { token } = req.query;
+    const { nuevaContrasena } = req.body;
+    if (!token || !nuevaContrasena) {
+        return res.status(400).json({ message: "Token y nueva contraseña son obligatorios" });
+    }
+    try {
+        if (!global.passwordResetTokens || !global.passwordResetTokens[token]) {
+            return res.status(400).json({ message: "Token inválido o expirado" });
+        }
+        const { userId, expires } = global.passwordResetTokens[token];
+        if (Date.now() > expires) {
+            delete global.passwordResetTokens[token];
+            return res.status(400).json({ message: "Token expirado" });
+        }
+        const bcrypt = require("bcrypt");
+        const hashed = await bcrypt.hash(nuevaContrasena, 10);
+        await Usuario.updatePassword(userId, { contrasena: hashed });
+        delete global.passwordResetTokens[token];
+        res.status(200).json({ message: "Contraseña restablecida correctamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al restablecer la contraseña" });
+    }
+};
+
+module.exports = { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword };
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
-const { registerUser, loginUser, verifyToken, resendVerification } = require("../controllers/authController");
+const { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword } = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario"); // Asegúrate de que la ruta sea correcta
 const path = require("path");
@@ -86,5 +86,11 @@ router.get("/verify-email", async (req, res) => {
 
 // Reenviar email de verificación
 router.post("/resend-verification", resendVerification);
+
+// Solicitar recuperación de contraseña
+router.post("/request-password-reset", requestPasswordReset);
+
+// Restablecer contraseña
+router.post("/reset-password", resetPassword);
 
 module.exports = router;
