@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const Usuario = require("../models/Usuario"); // Modelo de usuario
-const sendEmail = require("../config/sendgrid"); // Configuración de SendGrid
+const Usuario = require("../models/Usuario");
+const sendEmail = require("../config/sendgrid");
 
 const registerUser = async (req, res) => {
     const { nombre, email, password } = req.body;
@@ -105,5 +105,37 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-module.exports = { registerUser, loginUser, verifyToken };
+// Reenviar email de verificación
+const resendVerification = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ message: "El email es obligatorio" });
+    }
+    try {
+        const user = await Usuario.findByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        if (user.verificado) {
+            return res.status(400).json({ message: "El usuario ya está verificado" });
+        }
+        const jwt = require("jsonwebtoken");
+        const verificationToken = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+        const verificationUrl = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
+        await sendEmail(
+            email,
+            "Verifica tu cuenta",
+            `<h1>Bienvenido a PicMeTogether</h1><p>Por favor, verifica tu cuenta haciendo clic en el siguiente enlace:</p><a href="${verificationUrl}">Verificar cuenta</a>`
+        );
+        res.status(200).json({ message: "Correo de verificación reenviado" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al reenviar el correo de verificación" });
+    }
+};
+
+module.exports = { registerUser, loginUser, verifyToken, resendVerification };
 

@@ -41,6 +41,22 @@ const Usuario = {
     delete: async (id) => {
         await pool.query("DELETE FROM usuarios WHERE id = ?", [id]);
     },
+
+    findAll: async (search, limit, offset) => {
+        let query = "SELECT * FROM usuarios";
+        let params = [];
+        if (search) {
+            query += " WHERE nombre LIKE ? OR email LIKE ?";
+            params.push(`%${search}%`, `%${search}%`);
+        }
+        query += " ORDER BY id DESC";
+        if (limit) {
+            query += " LIMIT ? OFFSET ?";
+            params.push(Number(limit), Number(offset) || 0);
+        }
+        const [rows] = await pool.query(query, params);
+        return rows;
+    },
 };
 
 module.exports = Usuario;

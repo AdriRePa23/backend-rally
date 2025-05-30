@@ -1,6 +1,6 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
-const { registerUser, loginUser, verifyToken } = require("../controllers/authController");
+const { registerUser, loginUser, verifyToken, resendVerification } = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario"); // Asegúrate de que la ruta sea correcta
 const path = require("path");
@@ -83,5 +83,8 @@ router.get("/verify-email", async (req, res) => {
         res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
     }
 });
+
+// Reenviar email de verificación
+router.post("/resend-verification", resendVerification);
 
 module.exports = router;

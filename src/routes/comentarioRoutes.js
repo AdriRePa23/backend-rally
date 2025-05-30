@@ -1,6 +1,6 @@
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
-const { createComentario, getComentariosByPublicacion, deleteComentario } = require("../controllers/comentarioController");
+const { createComentario, getComentariosByPublicacion, deleteComentario, getComentariosByUsuario } = require("../controllers/comentarioController");
 const { check, validationResult } = require("express-validator");
 
 const router = express.Router();
@@ -38,6 +38,9 @@ router.get(
     },
     getComentariosByPublicacion
 );
+
+// Obtener comentarios de un usuario
+router.get("/usuario/:usuario_id", getComentariosByUsuario);
 
 // Eliminar un comentario
 router.delete(

@@ -97,6 +97,11 @@ const Rally = {
   delete: async (id) => {
     await pool.query("DELETE FROM rallies WHERE id = ?", [id]);
   },
+
+  findAllByUsuarioId: async (usuario_id) => {
+    const [rows] = await pool.query("SELECT * FROM rallies WHERE creador_id = ?", [usuario_id]);
+    return rows;
+  },
 };
 
 module.exports = Rally;

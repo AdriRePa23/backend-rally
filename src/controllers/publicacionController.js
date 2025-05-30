@@ -72,6 +72,35 @@ const getPublicacionesByUsuario = async (req, res) => {
     }
 };
 
+// Obtener publicaciones de un rally por usuario
+const getPublicacionesByRallyAndUsuario = async (req, res) => {
+    const { rally_id, usuario_id } = req.query;
+    if (!rally_id || !usuario_id) {
+        return res.status(400).json({ message: "Se requiere rally_id y usuario_id" });
+    }
+    try {
+        const publicaciones = await Publicacion.findAllByUsuarioId(usuario_id);
+        const filtradas = publicaciones.filter(p => p.rally_id == rally_id);
+        res.status(200).json(filtradas);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener las publicaciones" });
+    }
+};
+
+// Obtener todas las publicaciones de un rally ordenadas por votos descendente
+const getPublicacionesByRallyOrderByVotos = async (req, res) => {
+    const { rally_id } = req.query;
+    if (!rally_id) {
+        return res.status(400).json({ message: "El ID del rally es obligatorio" });
+    }
+    try {
+        const publicaciones = await Publicacion.findAllByRallyIdOrderByVotos(rally_id);
+        res.status(200).json(publicaciones);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener las publicaciones ordenadas por votos" });
+    }
+};
+
 const deletePublicacion = async (req, res) => {
     const { id } = req.params;
 
@@ -114,4 +143,4 @@ const getPublicacionById = async (req, res) => {
     }
 };
 
-module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario, getPublicacionById };
+module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario, getPublicacionById, getPublicacionesByRallyAndUsuario, getPublicacionesByRallyOrderByVotos };

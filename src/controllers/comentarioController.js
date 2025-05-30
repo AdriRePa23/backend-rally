@@ -46,6 +46,17 @@ const getComentariosByPublicacion = async (req, res) => {
     }
 };
 
+// Obtener comentarios de un usuario
+const getComentariosByUsuario = async (req, res) => {
+    const { usuario_id } = req.params;
+    try {
+        const comentarios = await Comentario.findAllByUsuarioId(usuario_id);
+        res.status(200).json(comentarios);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener los comentarios del usuario" });
+    }
+};
+
 // Eliminar un comentario
 const deleteComentario = async (req, res) => {
     const { id } = req.params;
@@ -81,4 +92,4 @@ const deleteComentario = async (req, res) => {
     }
 };
 
-module.exports = { createComentario, getComentariosByPublicacion, deleteComentario };
+module.exports = { createComentario, getComentariosByPublicacion, deleteComentario, getComentariosByUsuario };

@@ -15,6 +15,18 @@ const Publicacion = {
         return rows;
     },
 
+    findAllByRallyIdOrderByVotos: async (rally_id) => {
+        const [rows] = await pool.query(`
+            SELECT p.*, COUNT(v.id) AS votos
+            FROM publicaciones p
+            LEFT JOIN votaciones v ON p.id = v.publicacion_id
+            WHERE p.rally_id = ?
+            GROUP BY p.id
+            ORDER BY votos DESC
+        `, [rally_id]);
+        return rows;
+    },
+
     findById: async (id) => {
         const [rows] = await pool.query("SELECT * FROM publicaciones WHERE id = ?", [id]);
         return rows[0];

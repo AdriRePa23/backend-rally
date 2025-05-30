@@ -118,4 +118,14 @@ const getRallyById = async (req, res) => {
     }
 };
 
-module.exports = { createRally, getRallies, updateRally, deleteRally, getRalliesConImagen, getRallyById };
+const getRalliesByUsuario = async (req, res) => {
+    const { usuario_id } = req.params;
+    try {
+        const rallies = await Rally.findAllByUsuarioId(usuario_id);
+        res.status(200).json(rallies);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener los rallies del usuario" });
+    }
+};
+
+module.exports = { createRally, getRallies, updateRally, deleteRally, getRalliesConImagen, getRallyById, getRalliesByUsuario };
