@@ -33,8 +33,35 @@ const Usuario = {
         await pool.query("UPDATE usuarios SET contrasena = ? WHERE id = ?", [contrasena, id]);
     },
     update: async (id, data) => {
-        const fields = Object.keys(data).map((key) => `${key} = ?`).join(", ");
-        const values = Object.values(data);
+        // Si se incluye foto_perfil (archivo), subir a Cloudinary y reemplazar la anterior
+        let foto_perfil_url = data.foto_perfil;
+        const DEFAULT_IMG = 'https://res.cloudinary.com/di8rjwooa/image/upload/v1742723009/recursos/znkvsfuoi5e4ijatgvku.png';
+        if (data.foto_perfil && typeof data.foto_perfil !== 'string') {
+            const cloudinary = require("../config/cloudinary");
+            // Obtener usuario actual para borrar la imagen anterior si no es la predeterminada
+            const usuarioActual = await Usuario.findById(id);
+            if (usuarioActual && usuarioActual.foto_perfil && usuarioActual.foto_perfil !== DEFAULT_IMG) {
+                // Extraer public_id de la URL de Cloudinary
+                const urlParts = usuarioActual.foto_perfil.split('/');
+                const fileName = urlParts[urlParts.length - 1];
+                const publicId = 'usuarios/' + fileName.split('.')[0];
+                try {
+                    await cloudinary.uploader.destroy(publicId);
+                } catch (e) {}
+            }
+            // Subir la nueva imagen
+            const result = await cloudinary.uploader.upload(data.foto_perfil.path, {
+                folder: "usuarios",
+                resource_type: "image"
+            });
+            foto_perfil_url = result.secure_url;
+        }
+        // Construir el objeto de actualización
+        const updateData = { ...data };
+        if (foto_perfil_url) updateData.foto_perfil = foto_perfil_url;
+        delete updateData.foto_perfil_path;
+        const fields = Object.keys(updateData).map((key) => `${key} = ?`).join(", ");
+        const values = Object.values(updateData);
         await pool.query(`UPDATE usuarios SET ${fields} WHERE id = ?`, [...values, id]);
     },
 
