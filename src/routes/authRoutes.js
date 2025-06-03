@@ -1,6 +1,6 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
-const { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword } = require("../controllers/authController");
+const { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword, verifyEmail } = require("../controllers/authController");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/Usuario"); // Asegúrate de que la ruta sea correcta
 const path = require("path");
@@ -62,27 +62,7 @@ router.post("/verify-token", verifyToken, (req, res) => {
     });
 });
 
-router.get("/verify-email", async (req, res) => {
-    const { token } = req.query;
-
-    if (!token) {
-        return res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
-    }
-
-    try {
-        // Verificar el token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Actualizar el campo "verificado" del usuario
-        await Usuario.update(decoded.id, { verificado: 1 });
-
-        // Enviar la página HTML de éxito
-        res.sendFile(path.join(__dirname, "../views/verify-success.html"));
-    } catch (error) {
-        console.error(error);
-        res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
-    }
-});
+router.get("/verify-email", verifyEmail);
 
 // Reenviar email de verificación
 router.post("/resend-verification", resendVerification);

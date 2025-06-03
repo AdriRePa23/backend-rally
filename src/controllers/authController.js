@@ -194,5 +194,27 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword };
+// Verificar email (mover lógica aquí desde la ruta)
+const verifyEmail = async (req, res) => {
+    const { token } = req.query;
+    const path = require("path");
+    const jwt = require("jsonwebtoken");
+    const Usuario = require("../models/Usuario");
+    if (!token) {
+        return res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
+    }
+    try {
+        // Verificar el token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // Actualizar el campo "verificado" del usuario
+        await Usuario.update(decoded.id, { verificado: 1 });
+        // Enviar la página HTML de éxito
+        res.sendFile(path.join(__dirname, "../views/verify-success.html"));
+    } catch (error) {
+        console.error(error);
+        res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
+    }
+};
+
+module.exports = { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword, verifyEmail };
 
