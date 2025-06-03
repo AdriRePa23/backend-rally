@@ -201,18 +201,17 @@ const verifyEmail = async (req, res) => {
     const jwt = require("jsonwebtoken");
     const Usuario = require("../models/Usuario");
     if (!token) {
-        return res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
+        return res.status(400).json({ message: "Token expirado o invalido" });
     }
     try {
         // Verificar el token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         // Actualizar el campo "verificado" del usuario
         await Usuario.update(decoded.id, { verificado: 1 });
-        // Enviar la página HTML de éxito
-        res.sendFile(path.join(__dirname, "../views/verify-success.html"));
+        res.status(200).json({ message: "Cuenta verificada correctamente" });
     } catch (error) {
         console.error(error);
-        res.status(400).sendFile(path.join(__dirname, "../views/verify-error.html"));
+        return res.status(400).json({ message: error.message || "Token expirado o invalido" });
     }
 };
 
