@@ -40,7 +40,11 @@ const getUserPrivateInfo = async (req, res) => {
 // Actualizar datos de un usuario (solo dueño, admin o gestor)
 const updateUser = async (req, res) => {
     const { id } = req.params;
-    const data = req.body;
+    // Si viene archivo, añadirlo a data como foto_perfil
+    const data = { ...req.body };
+    if (req.file) {
+        data.foto_perfil = req.file;
+    }
     try {
         const user = await Usuario.findById(id);
         if (!user) {

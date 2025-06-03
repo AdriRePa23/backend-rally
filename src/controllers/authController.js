@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
         );
 
         // Enviar correo de verificación
-        const verificationUrl = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
+        const verificationUrl = process.env.FRONTEND_URL +`/auth/verify-email?token=${verificationToken}`;
         await sendEmail(
             email,
             "Verifica tu cuenta",
@@ -126,7 +126,7 @@ const resendVerification = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
-        const verificationUrl = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
+        const verificationUrl = process.env.FRONTEND_URL +`auth/verify-email?token=${verificationToken}`;
         await sendEmail(
             email,
             "Verifica tu cuenta",
@@ -156,7 +156,7 @@ const requestPasswordReset = async (req, res) => {
         if (!global.passwordResetTokens) global.passwordResetTokens = {};
         global.passwordResetTokens[token] = { userId: user.id, expires };
         // Enviar email con enlace
-        const resetUrl = `http://localhost:3000/api/auth/reset-password?token=${token}`;
+        const resetUrl = process.env.FRONTEND_URL +`/auth/reset-password?token=${token}`;
         await sendEmail(
             email,
             "Recupera tu contraseña",
