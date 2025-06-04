@@ -20,6 +20,7 @@
 - [Seguridad](#seguridad)
 - [Recursos externos](#recursos-externos)
 - [Autor](#autor)
+- [Base de datos y script SQL](#base-de-datos-y-script-sql)
 
 ---
 
@@ -85,8 +86,27 @@ Backend robusto para una aplicación de rallies fotográficos. Permite gestionar
 - **SendGrid:** Envío de emails
 
 ## 👤 Autor
-- [Tu Nombre]
-- Proyecto Integrado 2025
+- Adrián Real Palacios
+- Proyecto Integrado 2025 - IES VELÁZQUEZ
+
+## 🗄️ Base de datos y script SQL
+
+El archivo `basededatos.sql` incluido en el proyecto contiene todo el esquema necesario para inicializar la base de datos del backend. Incluye la creación de tablas, relaciones, inserción de roles y un usuario administrador por defecto.
+
+### ¿Cómo usar el script?
+1. Abre tu gestor de base de datos SQL (por ejemplo, MySQL Workbench, DBeaver, phpMyAdmin, etc.).
+2. Ejecuta el contenido de `basededatos.sql` para crear la base de datos, las tablas y los datos iniciales.
+3. Configura la conexión a la base de datos en el archivo `.env` del backend (por ejemplo, `SQL_URI` o los parámetros de conexión).
+
+### Tablas principales creadas
+- **roles**: Tipos de usuario (Participante, Administrador)
+- **usuarios**: Datos de usuario, rol, email, contraseña, etc.
+- **rallies**: Información de cada rally fotográfico
+- **publicaciones**: Fotografías subidas por los usuarios
+- **votaciones**: Votos a publicaciones
+- **comentarios**: Comentarios en publicaciones
+
+> El script también inserta un usuario administrador por defecto para facilitar el acceso inicial.
 
 ---
 
