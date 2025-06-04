@@ -14,7 +14,7 @@ const createRally = async (req, res) => {
             fecha_inicio,
             fecha_fin,
             categorias,
-            estado: "activo",
+            estado: "pendiente", 
             creador_id: req.user.id,
             cantidad_fotos_max,
         });
