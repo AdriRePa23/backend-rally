@@ -102,6 +102,15 @@ const Rally = {
     const [rows] = await pool.query("SELECT * FROM rallies WHERE creador_id = ?", [usuario_id]);
     return rows;
   },
+
+  // Buscar rallies por nombre (LIKE)
+  findByNombreLike: async (nombre) => {
+    const [rows] = await pool.query(
+      "SELECT * FROM rallies WHERE nombre LIKE ?",
+      [`%${nombre}%`]
+    );
+    return rows;
+  },
 };
 
 module.exports = Rally;

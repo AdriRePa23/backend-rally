@@ -47,6 +47,17 @@ router.get("/:id", getRallyById);
 // Obtener rallies creados por un usuario
 router.get("/usuario/:usuario_id", getRalliesByUsuario);
 
+// Buscar rallies por nombre (búsqueda parcial, LIKE)
+router.get("/buscar/nombre/:nombre", async (req, res) => {
+    const { nombre } = req.params;
+    try {
+        const rallies = await require("../models/Rally").findByNombreLike(nombre);
+        res.status(200).json(rallies);
+    } catch (error) {
+        res.status(500).json({ message: "Error al buscar rallies por nombre" });
+    }
+});
+
 // Actualizar un rally
 router.put(
     "/:id",
