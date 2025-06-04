@@ -21,6 +21,7 @@
 - [Recursos externos](#recursos-externos)
 - [Autor](#autor)
 - [Base de datos y script SQL](#base-de-datos-y-script-sql)
+- [Configuración del archivo .env](#-configuración-del-archivo-env)
 
 ---
 
@@ -108,6 +109,28 @@ El archivo `basededatos.sql` incluido en el proyecto contiene todo el esquema ne
 
 > El script también inserta un usuario administrador por defecto para facilitar el acceso inicial.
 
+## ⚙️ Configuración del archivo .env
+
+Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido (ajusta los valores según tu entorno):
+
+```env
+DB_HOST=           # Host de la base de datos SQL
+DB_USER=              # Usuario de la base de datos
+DB_PASSWORD=  # Contraseña de la base de datos
+DB_NAME=           # Nombre de la base de datos
+DB_PORT=3306                # Puerto de la base de datos (por defecto 3306 para MySQL)
+
+JWT_SECRET=...              # Clave secreta para firmar los JWT
+
+CLOUDINARY_CLOUD_NAME=...   # Nombre de tu cuenta Cloudinary
+CLOUDINARY_API_KEY=...      # API Key de Cloudinary
+CLOUDINARY_API_SECRET=...   # API Secret de Cloudinary
+
+SENDGRID_API_KEY=...        # API Key de SendGrid
+EMAIL_USER=...              # Email remitente para notificaciones
+
+FRONTEND_URL=http://localhost:5173 # URL permitida para CORS (frontend)
+```
 ---
 
-> Para más detalles, consulta la documentación técnica incluida en el repositorio.
+
