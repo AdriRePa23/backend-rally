@@ -48,6 +48,23 @@ const Publicacion = {
         const [rows] = await pool.query("SELECT * FROM publicaciones WHERE usuario_id = ?", [usuario_id]);
         return rows;
     },
+
+    // Buscar publicaciones por estado
+    findByEstado: async (estado) => {
+        let query = "SELECT * FROM publicaciones";
+        let params = [];
+        if (estado) {
+            query += " WHERE estado = ?";
+            params.push(estado);
+        }
+        const [rows] = await pool.query(query, params);
+        return rows;
+    },
+
+    // Actualizar solo el estado de una publicación
+    updateEstado: async (id, estado) => {
+        await pool.query("UPDATE publicaciones SET estado = ? WHERE id = ?", [estado, id]);
+    },
 };
 
 module.exports = Publicacion;

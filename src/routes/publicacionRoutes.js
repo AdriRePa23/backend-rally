@@ -73,4 +73,43 @@ router.delete(
     deletePublicacion
 );
 
+// Obtener publicaciones por estado
+router.get("/publicaciones", async (req, res) => {
+    const { estado } = req.query;
+    try {
+        const publicaciones = await require("../models/Publicacion").findByEstado(estado);
+        res.status(200).json(publicaciones);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener publicaciones" });
+    }
+});
+
+// Modificar el estado de una publicación (solo admin o gestor)
+const { verifyToken } = require("../controllers/authController");
+router.put("/publicaciones/:id/estado", verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { estado } = req.body;
+    const usuario = req.user;
+    if (![2, 3].includes(usuario.rol_id)) {
+        return res.status(403).json({ message: "No tienes permisos para modificar el estado" });
+    }
+    try {
+        await require("../models/Publicacion").updateEstado(id, estado);
+        res.status(200).json({ message: "Estado actualizado correctamente" });
+    } catch (error) {
+        res.status(500).json({ message: "Error al actualizar el estado" });
+    }
+});
+
+// Obtener publicaciones por estado (el estado va en la ruta)
+router.get("/estado/:estado", async (req, res) => {
+    const { estado } = req.params;
+    try {
+        const publicaciones = await require("../models/Publicacion").findByEstado(estado);
+        res.status(200).json(publicaciones);
+    } catch (error) {
+        res.status(500).json({ message: "Error al obtener publicaciones" });
+    }
+});
+
 module.exports = router;
