@@ -43,6 +43,7 @@ const getEstadisticas = async (req, res) => {
 };
 
 // Estadísticas de un rally (solo dueño o admin)
+// Valida permisos y existencia de rally antes de mostrar estadísticas
 const getEstadisticasRally = async (req, res) => {
     const { id } = req.params;
     try {

@@ -38,6 +38,7 @@ const getUserPrivateInfo = async (req, res) => {
 };
 
 // Actualizar datos de un usuario (solo dueño, admin o gestor)
+// Valida permisos y unicidad de email antes de actualizar usuario
 const updateUser = async (req, res) => {
     const { id } = req.params;
     // Si viene archivo, añadirlo a data como foto_perfil
@@ -53,6 +54,13 @@ const updateUser = async (req, res) => {
         if (req.user.id !== parseInt(id) && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para modificar este usuario" });
         }
+        // Verificar si el email ya está en uso por otro usuario
+        if (data.email && data.email !== user.email) {
+            const emailExists = await Usuario.findByEmail(data.email);
+            if (emailExists) {
+                return res.status(400).json({ message: "El email ya está en uso por otro usuario" });
+            }
+        }
         await Usuario.update(id, data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });
     } catch (error) {
@@ -61,6 +69,7 @@ const updateUser = async (req, res) => {
 };
 
 // Eliminar un usuario (solo dueño, admin o gestor)
+// Elimina la foto de perfil de Cloudinary si existe antes de borrar el usuario en SQL
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
@@ -71,7 +80,6 @@ const deleteUser = async (req, res) => {
         if (req.user.id !== parseInt(id) && req.user.rol_id !== 2 && req.user.rol_id !== 3) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este usuario" });
         }
-        // Eliminar la foto de perfil de Cloudinary si existe
         if (user.foto_perfil) {
             const publicId = user.foto_perfil.split("/").pop().split(".")[0];
             await cloudinary.uploader.destroy(`usuarios/${publicId}`);

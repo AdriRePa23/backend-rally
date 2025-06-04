@@ -19,11 +19,12 @@ router.put(
     protect,
     upload.single("foto_perfil"),
     [
-        check("nombre", "El nombre debe tener un máximo de 255 caracteres").optional().isLength({ max: 255 }),
+        check("nombre", "El nombre debe tener un máximo de 255 caracteres").optional().isLength({ max: 255 }).trim().escape(),
         check("email", "El email debe ser válido y tener un máximo de 255 caracteres")
             .optional()
             .isEmail()
-            .isLength({ max: 255 }),
+            .isLength({ max: 255 })
+            .trim().escape(),
         check("rol_id", "El rol debe ser un número entero válido").optional().isInt({ min: 1, max: 3 }),
     ],
     async (req, res, next) => {

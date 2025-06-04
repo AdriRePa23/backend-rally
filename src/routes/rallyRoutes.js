@@ -12,15 +12,18 @@ router.post(
     [
         check("nombre", "El nombre es obligatorio y debe tener un máximo de 255 caracteres")
             .notEmpty()
-            .isLength({ max: 255 }),
+            .isLength({ max: 255 })
+            .trim().escape(),
         check("descripcion", "La descripción debe tener un máximo de 500 caracteres")
             .optional()
-            .isLength({ max: 500 }),
+            .isLength({ max: 500 })
+            .trim().escape(),
         check("fecha_inicio", "La fecha de inicio es obligatoria y debe ser válida").notEmpty().isDate(),
         check("fecha_fin", "La fecha de fin es obligatoria y debe ser válida").notEmpty().isDate(),
         check("categorias", "Las categorías deben tener un máximo de 255 caracteres")
             .optional()
-            .isLength({ max: 255 }),
+            .isLength({ max: 255 })
+            .trim().escape(),
         check("cantidad_fotos_max", "La cantidad máxima de fotos debe ser un número entero positivo y máximo 100")
             .notEmpty()
             .isInt({ min: 1, max: 100 }),

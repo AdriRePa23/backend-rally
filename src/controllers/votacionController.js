@@ -1,6 +1,7 @@
 const Votacion = require("../models/Votacion");
 const Publicacion = require("../models/Publicacion"); 
 
+// Valida que el usuario no vote dos veces ni a sí mismo antes de registrar el voto
 const createVotacion = async (req, res) => {
     const { publicacion_id } = req.body;
 

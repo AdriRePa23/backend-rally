@@ -1,7 +1,7 @@
 const Comentario = require("../models/Comentario");
 const Publicacion = require("../models/Publicacion");
 
-// Crear un comentario
+// Valida existencia de publicación antes de crear comentario
 const createComentario = async (req, res) => {
     const { publicacion_id, comentario } = req.body;
 
@@ -57,7 +57,7 @@ const getComentariosByUsuario = async (req, res) => {
     }
 };
 
-// Eliminar un comentario
+// Valida permisos antes de eliminar comentario
 const deleteComentario = async (req, res) => {
     const { id } = req.params;
 

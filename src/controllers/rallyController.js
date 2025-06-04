@@ -2,6 +2,7 @@ const Rally = require("../models/Rally");
 const Publicacion = require("../models/Publicacion");
 const cloudinary = require("../config/cloudinary");
 
+// Crea un rally con estado 'pendiente' y valida campos obligatorios
 const createRally = async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, cantidad_fotos_max } = req.body;
 
@@ -85,22 +86,19 @@ const updateRally = async (req, res) => {
     }
 };
 
+// Elimina un rally y todas las imágenes de publicaciones asociadas en Cloudinary antes de borrar en SQL
 const deleteRally = async (req, res) => {
     const { id } = req.params;
-
     try {
         const rally = await Rally.findById(id);
         if (!rally) {
             return res.status(404).json({ message: "Rally no encontrado" });
         }
-
         if (rally.creador_id !== req.user.id && req.user.rol_id !== 2) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este rally" });
         }
-
-        // Obtener todas las publicaciones asociadas a este rally
+        // Borra imágenes de Cloudinary de todas las publicaciones asociadas
         const publicaciones = await Publicacion.findAllByRallyId(id);
-        // Eliminar cada imagen de Cloudinary
         for (const pub of publicaciones) {
             if (pub.fotografia) {
                 try {
@@ -108,17 +106,13 @@ const deleteRally = async (req, res) => {
                     const publicacionPublicId = publicacionUrl.split("/").pop().split(".")[0];
                     await cloudinary.uploader.destroy(`publicaciones/${publicacionPublicId}`);
                 } catch (e) {
-                    // Si falla el borrado de una imagen, continuar con las demás
-                    console.warn(`No se pudo borrar la imagen de Cloudinary para la publicación ${pub.id}`);
+                    // Si falla el borrado de una imagen, continuar
                 }
             }
         }
-
         await Rally.delete(id);
-
         res.status(200).json({ message: "Rally eliminado correctamente" });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Error al eliminar el rally" });
     }
 };

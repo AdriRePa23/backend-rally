@@ -16,7 +16,8 @@ router.post(
         check("rally_id", "El ID del rally es obligatorio").notEmpty().isInt().withMessage("Debe ser un número entero"),
         check("descripcion", "La descripción debe tener un máximo de 500 caracteres")
             .optional()
-            .isLength({ max: 500 }),
+            .isLength({ max: 500 })
+            .trim().escape(),
     ],
     (req, res, next) => {
         const errors = validationResult(req);
