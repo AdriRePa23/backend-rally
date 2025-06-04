@@ -1,4 +1,6 @@
 const Rally = require("../models/Rally");
+const Publicacion = require("../models/Publicacion");
+const cloudinary = require("../config/cloudinary");
 
 const createRally = async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, cantidad_fotos_max } = req.body;
@@ -94,6 +96,22 @@ const deleteRally = async (req, res) => {
 
         if (rally.creador_id !== req.user.id && req.user.rol_id !== 2) {
             return res.status(403).json({ message: "No tienes permiso para eliminar este rally" });
+        }
+
+        // Obtener todas las publicaciones asociadas a este rally
+        const publicaciones = await Publicacion.findAllByRallyId(id);
+        // Eliminar cada imagen de Cloudinary
+        for (const pub of publicaciones) {
+            if (pub.fotografia) {
+                try {
+                    const publicacionUrl = pub.fotografia;
+                    const publicacionPublicId = publicacionUrl.split("/").pop().split(".")[0];
+                    await cloudinary.uploader.destroy(`publicaciones/${publicacionPublicId}`);
+                } catch (e) {
+                    // Si falla el borrado de una imagen, continuar con las demás
+                    console.warn(`No se pudo borrar la imagen de Cloudinary para la publicación ${pub.id}`);
+                }
+            }
         }
 
         await Rally.delete(id);
