@@ -11,7 +11,11 @@ router.post(
     protect,
     [
         check("publicacion_id", "El ID de la publicación es obligatorio y debe ser un número entero").notEmpty().isInt(),
-        check("comentario", "El comentario es obligatorio").notEmpty(),
+        check("comentario", "El comentario es obligatorio y debe tener máximo 500 caracteres")
+            .notEmpty()
+            .isLength({ max: 500 })
+            .trim()
+            .escape(),
     ],
     (req, res, next) => {
         const errors = validationResult(req);

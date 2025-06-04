@@ -23,6 +23,18 @@ router.post(
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+        // Validar imagen
+        if (!req.file) {
+            return res.status(400).json({ errors: [{ msg: "La imagen es obligatoria", param: "fotografia" }] });
+        }
+        // Validar tipo y tamaño de imagen
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(req.file.mimetype)) {
+            return res.status(400).json({ errors: [{ msg: "Solo se permiten imágenes JPG, PNG o WEBP", param: "fotografia" }] });
+        }
+        if (req.file.size > 5 * 1024 * 1024) {
+            return res.status(400).json({ errors: [{ msg: "La imagen no puede superar los 5MB", param: "fotografia" }] });
+        }
         next();
     },
     createPublicacion

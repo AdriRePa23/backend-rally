@@ -19,7 +19,18 @@ router.post(
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        next();
+        // Validar que el usuario no vote su propia publicación
+        if (req.user) {
+            const Publicacion = require("../models/Publicacion");
+            Publicacion.findById(req.body.publicacion_id).then(pub => {
+                if (pub && pub.usuario_id === req.user.id) {
+                    return res.status(400).json({ errors: [{ msg: "No puedes votar tu propia publicación", param: "publicacion_id" }] });
+                }
+                next();
+            });
+        } else {
+            next();
+        }
     },
     createVotacion
 );

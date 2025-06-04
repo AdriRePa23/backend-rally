@@ -18,14 +18,20 @@ router.post(
             .notEmpty()
             .isEmail()
             .isLength({ max: 255 }),
-        check("password", "La contraseña es obligatoria, debe tener entre 6 y 255 caracteres")
+        check("password", "La contraseña es obligatoria, debe tener entre 6 y 255 caracteres, una mayúscula, una minúscula y un número")
             .notEmpty()
-            .isLength({ min: 6, max: 255 }),
+            .isLength({ min: 6, max: 255 })
+            .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/),
     ],
-    (req, res, next) => {
+    async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
+        }
+        // Validación extra: email único
+        const existingUser = await Usuario.findByEmail(req.body.email);
+        if (existingUser) {
+            return res.status(400).json({ errors: [{ msg: "El email ya está registrado", param: "email" }] });
         }
         next();
     },

@@ -21,14 +21,19 @@ router.post(
         check("categorias", "Las categorías deben tener un máximo de 255 caracteres")
             .optional()
             .isLength({ max: 255 }),
-        check("cantidad_fotos_max", "La cantidad máxima de fotos debe ser un número entero positivo")
+        check("cantidad_fotos_max", "La cantidad máxima de fotos debe ser un número entero positivo y máximo 100")
             .notEmpty()
-            .isInt({ min: 1 }),
+            .isInt({ min: 1, max: 100 }),
     ],
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
+        }
+        // Validar que fecha_fin > fecha_inicio
+        const { fecha_inicio, fecha_fin } = req.body;
+        if (new Date(fecha_fin) <= new Date(fecha_inicio)) {
+            return res.status(400).json({ errors: [{ msg: "La fecha de fin debe ser posterior a la de inicio", param: "fecha_fin" }] });
         }
         next();
     },
