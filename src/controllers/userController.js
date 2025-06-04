@@ -16,6 +16,7 @@ const getUserById = async (req, res) => {
         const { contrasena, ...userData } = user;
         res.status(200).json(userData);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener el usuario" });
     }
 };
@@ -33,6 +34,7 @@ const getUserPrivateInfo = async (req, res) => {
         }
         res.status(200).json(user);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener la información privada del usuario" });
     }
 };
@@ -64,6 +66,7 @@ const updateUser = async (req, res) => {
         await Usuario.update(id, data);
         res.status(200).json({ message: "Usuario actualizado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al actualizar el usuario" });
     }
 };
@@ -87,6 +90,7 @@ const deleteUser = async (req, res) => {
         await Usuario.delete(id);
         res.status(200).json({ message: "Usuario eliminado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al eliminar el usuario" });
     }
 };
@@ -105,6 +109,7 @@ const listUsers = async (req, res) => {
             return userData;
         }));
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los usuarios" });
     }
 };
@@ -119,6 +124,7 @@ const getMe = async (req, res) => {
         const { contrasena, ...userData } = user;
         res.status(200).json(userData);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener el perfil" });
     }
 };
@@ -138,6 +144,7 @@ const updatePassword = async (req, res) => {
         await Usuario.updatePassword(id, { contrasena: hashed });
         res.status(200).json({ message: "Contraseña actualizada correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al actualizar la contraseña" });
     }
 };
@@ -161,6 +168,7 @@ const getUserStats = async (req, res) => {
             total_votos: votos[0].total_votos
         });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener estadísticas del usuario" });
     }
 };
@@ -179,6 +187,7 @@ const createAdmin = async (req, res) => {
         const adminId = await Usuario.createAdmin({ nombre, email, contrasena: hashed, rol_id: 1 });
         res.status(201).json({ message: "Administrador creado correctamente", adminId });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al crear el administrador" });
     }
 };
@@ -197,6 +206,7 @@ const createGestor = async (req, res) => {
         const gestorId = await Usuario.createAdmin({ nombre, email, contrasena: hashed, rol_id: 3 });
         res.status(201).json({ message: "Gestor creado correctamente", gestorId });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al crear el gestor" });
     }
 };
@@ -211,6 +221,7 @@ const getAdminById = async (req, res) => {
         }
         res.status(200).json(admin);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener el administrador" });
     }
 };
@@ -231,6 +242,7 @@ const updateAdmin = async (req, res) => {
         await Usuario.updateAdmin(id, { nombre: nombre || admin.nombre, email: email || admin.email, contrasena: hashed });
         res.status(200).json({ message: "Administrador actualizado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al actualizar el administrador" });
     }
 };
@@ -246,6 +258,7 @@ const deleteAdmin = async (req, res) => {
         await Usuario.deleteAdmin(id);
         res.status(200).json({ message: "Administrador eliminado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al eliminar el administrador" });
     }
 };
@@ -260,6 +273,7 @@ const listGestores = async (req, res) => {
         const [gestores] = await pool.query("SELECT id, nombre, email, rol_id FROM usuarios WHERE rol_id = 3");
         res.status(200).json(gestores);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los gestores" });
     }
 };
@@ -278,6 +292,7 @@ const getGestorById = async (req, res) => {
         }
         res.status(200).json(gestores[0]);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener el gestor" });
     }
 };
@@ -303,6 +318,7 @@ const updateGestor = async (req, res) => {
         await pool.query("UPDATE usuarios SET nombre = ?, email = ?, contrasena = ? WHERE id = ? AND rol_id = 3", [nombre || gestores[0].nombre, email || gestores[0].email, hashed, id]);
         res.status(200).json({ message: "Gestor actualizado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al actualizar el gestor" });
     }
 };
@@ -322,6 +338,7 @@ const deleteGestor = async (req, res) => {
         await pool.query("DELETE FROM usuarios WHERE id = ? AND rol_id = 3", [id]);
         res.status(200).json({ message: "Gestor eliminado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al eliminar el gestor" });
     }
 };

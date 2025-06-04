@@ -24,7 +24,7 @@ const createRally = async (req, res) => {
 
         res.status(201).json({ message: "Rally creado correctamente", rallyId });
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al crear el rally" });
     }
 };
@@ -34,7 +34,7 @@ const getRallies = async (req, res) => {
         const rallies = await Rally.findAll();
         res.status(200).json(rallies);
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los rallies" });
     }
 };
@@ -47,7 +47,7 @@ const getRalliesConImagen = async (req, res) => {
         // Enviar la respuesta con todos los rallies
         res.status(200).json(rallies);
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los rallies" });
     }
 };
@@ -81,7 +81,7 @@ const updateRally = async (req, res) => {
 
         res.status(200).json({ message: "Rally actualizado correctamente" });
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al actualizar el rally" });
     }
 };
@@ -113,6 +113,7 @@ const deleteRally = async (req, res) => {
         await Rally.delete(id);
         res.status(200).json({ message: "Rally eliminado correctamente" });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al eliminar el rally" });
     }
 };
@@ -126,6 +127,7 @@ const getRallyById = async (req, res) => {
         }
         res.status(200).json(rally);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener el rally" });
     }
 };
@@ -136,6 +138,7 @@ const getRalliesByUsuario = async (req, res) => {
         const rallies = await Rally.findAllByUsuarioId(usuario_id);
         res.status(200).json(rallies);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los rallies del usuario" });
     }
 };

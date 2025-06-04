@@ -21,7 +21,7 @@ const createComentario = async (req, res) => {
 
         res.status(201).json({ message: "Comentario creado correctamente", comentarioId });
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al crear el comentario" });
     }
 };
@@ -41,7 +41,7 @@ const getComentariosByPublicacion = async (req, res) => {
         const comentarios = await Comentario.findAllByPublicacionId(publicacion_id);
         res.status(200).json(comentarios);
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los comentarios" });
     }
 };
@@ -53,6 +53,7 @@ const getComentariosByUsuario = async (req, res) => {
         const comentarios = await Comentario.findAllByUsuarioId(usuario_id);
         res.status(200).json(comentarios);
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los comentarios del usuario" });
     }
 };
@@ -88,7 +89,7 @@ const deleteComentario = async (req, res) => {
         await Comentario.delete(id);
         res.status(200).json({ message: "Comentario eliminado correctamente" });
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al eliminar el comentario" });
     }
 };

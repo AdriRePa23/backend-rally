@@ -37,7 +37,7 @@ const getEstadisticas = async (req, res) => {
             usuarios_mas_activos: usuariosActivos,
         });
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener las estadísticas" });
     }
 };
@@ -69,6 +69,7 @@ const getEstadisticasRally = async (req, res) => {
             publicaciones_por_usuario: publicacionesPorUsuario
         });
     } catch (error) {
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener estadísticas del rally" });
     }
 };

@@ -34,7 +34,7 @@ const createVotacion = async (req, res) => {
 
         res.status(201).json({ message: "Voto registrado correctamente" });
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al registrar el voto" });
     }
 };
@@ -50,7 +50,7 @@ const getVotosByPublicacion = async (req, res) => {
         const votos = await Votacion.findByPublicacionId(publicacion_id);
         res.status(200).json(votos);
     } catch (error) {
-        console.error(error);
+        // No log de error en producción para evitar fuga de información
         res.status(500).json({ message: "Error al obtener los votos" });
     }
 };
