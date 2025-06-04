@@ -2,8 +2,7 @@
 
 ## Portada
 - **Proyecto:** Backend Rally Fotográfico
-- **Autor:** [Tu Nombre]
-- **Fecha:** 4 de junio de 2025
+- **Autor:** Adrián Real Palacios
 - **Descripción:** API REST segura y profesional para la gestión de rallies fotográficos.
 
 ---
