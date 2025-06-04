@@ -9,6 +9,7 @@ const comentarioRoutes = require("./routes/comentarioRoutes");
 const estadisticasRoutes = require("./routes/estadisticasRoutes");
 const userRoutes = require("./routes/userRoutes");
 const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(helmet());
 
 // Rate limiting para endpoints de autenticación
 const authLimiter = rateLimit({

@@ -47,7 +47,10 @@ const Usuario = {
                 const publicId = 'usuarios/' + fileName.split('.')[0];
                 try {
                     await cloudinary.uploader.destroy(publicId);
-                } catch (e) {}
+                } catch (error) {
+                    // No log de error en producción para evitar fuga de información
+                    throw error;
+                }
             }
             // Subir la nueva imagen
             const result = await cloudinary.uploader.upload(data.foto_perfil.path, {

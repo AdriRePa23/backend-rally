@@ -13,9 +13,9 @@ const sendEmail = async (to, subject, html) => {
             subject,
             html,
         });
-        console.log("Correo enviado exitosamente");
+        // Log eliminado para producción
     } catch (error) {
-        console.error("Error al enviar el correo:", error.response?.body || error.message);
+        // Log eliminado para producción
     }
 };
 
