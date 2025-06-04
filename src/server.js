@@ -8,7 +8,6 @@ const votacionRoutes = require("./routes/votacionRoutes");
 const comentarioRoutes = require("./routes/comentarioRoutes");
 const estadisticasRoutes = require("./routes/estadisticasRoutes");
 const userRoutes = require("./routes/userRoutes");
-const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
 dotenv.config();
@@ -34,17 +33,8 @@ app.use(cors({
 app.use(express.json());
 app.use(helmet());
 
-// Rate limiting para endpoints de autenticación
-const authLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minuto
-    max: 5, // máximo 5 intentos por IP
-    message: { message: "Demasiados intentos, espera un minuto e inténtalo de nuevo." },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
 // Rutas de autenticación
-app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Rutas de rallies
 app.use("/api/rallies", rallyRoutes);
