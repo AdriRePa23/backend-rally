@@ -3,10 +3,10 @@ const Publicacion = require("../models/Publicacion");
 
 // Valida que el usuario no vote dos veces ni a sí mismo antes de registrar el voto
 const createVotacion = async (req, res) => {
-    const { publicacion_id } = req.body;
+    const { publicacion_id, ip } = req.body;
 
-    if (!publicacion_id) {
-        return res.status(400).json({ message: "El ID de la publicación es obligatorio" });
+    if (!publicacion_id || !ip) {
+        return res.status(400).json({ message: "El ID de la publicación y la IP son obligatorios" });
     }
 
     try {
@@ -15,11 +15,8 @@ const createVotacion = async (req, res) => {
         if (!publicacion) {
             return res.status(404).json({ message: "La publicación no existe" });
         }
-
-        const ip = req.ip; // Obtener la IP del cliente
-        const usuario_id = req.user ? req.user.id : null; // Si el usuario está autenticado
-
-        // Verificar si ya votó (por usuario o IP)
+        const usuario_id = req.user ? req.user.id : null;
+        // Verificar si ya votó (por IP o usuario)
         const existingVoteByIp = await Votacion.findByIpAndPublicacion(ip, publicacion_id);
         const existingVoteByUser = usuario_id
             ? await Votacion.findByUserAndPublicacion(usuario_id, publicacion_id)
@@ -32,12 +29,12 @@ const createVotacion = async (req, res) => {
         // Crear el voto
         await Votacion.create({ ip, publicacion_id, usuario_id });
 
-        res.status(201).json({ message: "Voto registrado correctamente" });
+        return res.status(201).json({ message: "Voto registrado correctamente" });
     } catch (error) {
-        // No log de error en producción para evitar fuga de información
-        res.status(500).json({ message: "Error al registrar el voto" });
+        return res.status(500).json({ message: "Error al registrar el voto" });
     }
 };
+
 
 const getVotosByPublicacion = async (req, res) => {
     const { publicacion_id } = req.query;
