@@ -61,12 +61,22 @@ const getEstadisticasRally = async (req, res) => {
         const [participantes] = await pool.query("SELECT COUNT(DISTINCT usuario_id) AS total FROM publicaciones WHERE rally_id = ?", [id]);
         const [votosPorPublicacion] = await pool.query(`SELECT p.id, p.descripcion, COUNT(v.id) AS votos FROM publicaciones p LEFT JOIN votaciones v ON p.id = v.publicacion_id WHERE p.rally_id = ? GROUP BY p.id ORDER BY votos DESC`, [id]);
         const [publicacionesPorUsuario] = await pool.query(`SELECT u.id, u.nombre, COUNT(p.id) AS publicaciones FROM usuarios u JOIN publicaciones p ON u.id = p.usuario_id WHERE p.rally_id = ? GROUP BY u.id ORDER BY publicaciones DESC`, [id]);
+        const [top3] = await pool.query(`
+            SELECT p.id, p.descripcion, COUNT(v.id) AS votos
+            FROM publicaciones p
+            LEFT JOIN votaciones v ON p.id = v.publicacion_id
+            WHERE p.rally_id = ?
+            GROUP BY p.id
+            ORDER BY votos DESC
+            LIMIT 3
+        `, [id]);
         res.status(200).json({
             total_publicaciones: totalPublicaciones[0].total,
             total_votos: totalVotos[0].total,
             total_participantes: participantes[0].total,
             votos_por_publicacion: votosPorPublicacion,
-            publicaciones_por_usuario: publicacionesPorUsuario
+            publicaciones_por_usuario: publicacionesPorUsuario,
+            top_3_mas_votadas: top3
         });
     } catch (error) {
         // No log de error en producción para evitar fuga de información
