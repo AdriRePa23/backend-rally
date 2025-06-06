@@ -1,3 +1,4 @@
+// Rutas de publicaciones: crear, consultar, eliminar y modificar publicaciones
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
 const { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario, getPublicacionById, getPublicacionesByRallyAndUsuario, getPublicacionesByRallyOrderByVotos } = require("../controllers/publicacionController");
@@ -7,7 +8,7 @@ const { check, validationResult } = require("express-validator");
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // Configuración básica de multer
 
-// Crear una publicación
+// Crear una publicación (requiere autenticación y validación de imagen)
 router.post(
     "/",
     protect,
@@ -69,7 +70,7 @@ router.get("/rally-usuario", getPublicacionesByRallyAndUsuario);
 // Obtener publicaciones de un rally ordenadas por votos descendente
 router.get("/ordenadas/votos", getPublicacionesByRallyOrderByVotos);
 
-// Eliminar una publicación
+// Eliminar una publicación (requiere autenticación)
 router.delete(
     "/:id",
     protect,
@@ -86,7 +87,7 @@ router.delete(
     deletePublicacion
 );
 
-// Obtener publicaciones por estado
+// Obtener publicaciones por estado (query o ruta)
 router.get("/publicaciones", async (req, res) => {
     const { estado } = req.query;
     try {
@@ -125,4 +126,5 @@ router.get("/estado/:estado", async (req, res) => {
     }
 });
 
+// Exporta el router de publicaciones
 module.exports = router;

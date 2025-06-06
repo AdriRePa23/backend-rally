@@ -1,3 +1,4 @@
+// Rutas de votaciones: registrar y consultar votos sobre publicaciones
 const express = require("express");
 const optionalAuth = require("../middlewares/optionalAuthMiddleware");
 const { createVotacion, getVotosByPublicacion } = require("../controllers/votacionController");
@@ -53,4 +54,5 @@ router.get(
     getVotosByPublicacion
 );
 
+// Exporta el router de votaciones
 module.exports = router;

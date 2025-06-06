@@ -1,6 +1,8 @@
+// Modelo de Publicación: gestiona operaciones sobre la tabla 'publicaciones'
 const pool = require("../config/db");
 
 const Publicacion = {
+    // Crea una nueva publicación
     create: async (data) => {
         const { usuario_id, fotografia, descripcion, estado, rally_id } = data;
         try {
@@ -15,6 +17,7 @@ const Publicacion = {
         }
     },
 
+    // Obtiene todas las publicaciones de un rally
     findAllByRallyId: async (rally_id) => {
         try {
             const [rows] = await pool.query("SELECT * FROM publicaciones WHERE rally_id = ?", [rally_id]);
@@ -25,6 +28,7 @@ const Publicacion = {
         }
     },
 
+    // Obtiene todas las publicaciones de un rally ordenadas por votos
     findAllByRallyIdOrderByVotos: async (rally_id) => {
         try {
             const [rows] = await pool.query(`
@@ -42,6 +46,7 @@ const Publicacion = {
         }
     },
 
+    // Busca publicación por ID
     findById: async (id) => {
         try {
             const [rows] = await pool.query("SELECT * FROM publicaciones WHERE id = ?", [id]);
@@ -52,6 +57,7 @@ const Publicacion = {
         }
     },
 
+    // Actualiza datos de una publicación
     update: async (id, data) => {
         const { fotografia, descripcion, estado } = data;
         try {
@@ -65,6 +71,7 @@ const Publicacion = {
         }
     },
 
+    // Elimina una publicación
     delete: async (id) => {
         try {
             await pool.query("DELETE FROM publicaciones WHERE id = ?", [id]);
@@ -74,6 +81,7 @@ const Publicacion = {
         }
     },
 
+    // Obtiene todas las publicaciones de un usuario
     findAllByUsuarioId: async (usuario_id) => {
         try {
             const [rows] = await pool.query("SELECT * FROM publicaciones WHERE usuario_id = ?", [usuario_id]);
@@ -84,7 +92,7 @@ const Publicacion = {
         }
     },
 
-    // Buscar publicaciones por estado
+    // Busca publicaciones por estado
     findByEstado: async (estado) => {
         let query = "SELECT * FROM publicaciones";
         let params = [];
@@ -101,7 +109,7 @@ const Publicacion = {
         }
     },
 
-    // Actualizar solo el estado de una publicación
+    // Actualiza solo el estado de una publicación
     updateEstado: async (id, estado) => {
         try {
             await pool.query("UPDATE publicaciones SET estado = ? WHERE id = ?", [estado, id]);
@@ -112,4 +120,5 @@ const Publicacion = {
     },
 };
 
+// Exporta el modelo de publicación
 module.exports = Publicacion;

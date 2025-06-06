@@ -1,6 +1,8 @@
+// Modelo de Usuario: gestiona operaciones sobre la tabla 'usuarios'
 const pool = require("../config/db");
 
 const Usuario = {
+    // Crea un nuevo usuario
     create: async (data) => {
         const { nombre, email, contrasena, rol_id } = data;
         const [result] = await pool.query(
@@ -10,16 +12,19 @@ const Usuario = {
         return result.insertId;
     },
 
+    // Busca usuario por email
     findByEmail: async (email) => {
         const [rows] = await pool.query("SELECT * FROM usuarios WHERE email = ?", [email]);
         return rows[0];
     },
 
+    // Busca usuario por ID
     findById: async (id) => {
         const [rows] = await pool.query("SELECT * FROM usuarios WHERE id = ?", [id]);
         return rows[0];
     },
 
+    // Actualiza todos los datos de un usuario
     updateData: async (id, data) => {
         const { nombre, email, contrasena, foto_perfil, verificado, rol_id } = data;
         await pool.query(
@@ -28,10 +33,12 @@ const Usuario = {
         );
     },
 
+    // Actualiza solo la contraseña
     updatePassword: async (id, data) => {
         const { contrasena } = data;
         await pool.query("UPDATE usuarios SET contrasena = ? WHERE id = ?", [contrasena, id]);
     },
+    // Actualiza datos generales y foto de perfil (gestiona Cloudinary)
     update: async (id, data) => {
         // Si se incluye foto_perfil (archivo), subir a Cloudinary y reemplazar la anterior
         let foto_perfil_url = data.foto_perfil;
@@ -68,10 +75,12 @@ const Usuario = {
         await pool.query(`UPDATE usuarios SET ${fields} WHERE id = ?`, [...values, id]);
     },
 
+    // Elimina un usuario
     delete: async (id) => {
         await pool.query("DELETE FROM usuarios WHERE id = ?", [id]);
     },
 
+    // Lista usuarios con búsqueda y paginación
     findAll: async (search, limit, offset) => {
         let query = "SELECT * FROM usuarios";
         let params = [];
@@ -88,6 +97,7 @@ const Usuario = {
         return rows;
     },
 
+    // Crea un administrador o gestor
     createAdmin: async (data) => {
         const { nombre, email, contrasena, rol_id } = data;
         const [result] = await pool.query(
@@ -96,10 +106,12 @@ const Usuario = {
         );
         return result.insertId;
     },
+    // Busca admin por ID
     findAdminById: async (id) => {
         const [rows] = await pool.query("SELECT id, nombre, email, rol_id FROM usuarios WHERE id = ? AND rol_id = 1", [id]);
         return rows[0];
     },
+    // Actualiza datos de admin
     updateAdmin: async (id, data) => {
         const { nombre, email, contrasena } = data;
         await pool.query(
@@ -107,9 +119,11 @@ const Usuario = {
             [nombre, email, contrasena, id]
         );
     },
+    // Elimina admin
     deleteAdmin: async (id) => {
         await pool.query("DELETE FROM usuarios WHERE id = ? AND rol_id = 1", [id]);
     },
 };
 
+// Exporta el modelo de usuario
 module.exports = Usuario;

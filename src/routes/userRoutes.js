@@ -1,3 +1,4 @@
+// Rutas de usuario: registro, login, perfil, gestión de usuarios y roles
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
 const { getUserById, updateUser, deleteUser, getUserPrivateInfo, listUsers, getMe, updatePassword, getUserStats, createAdmin, getAdminById, updateAdmin, deleteAdmin, createGestor, listGestores, getGestorById, updateGestor, deleteGestor } = require("../controllers/userController");
@@ -70,24 +71,16 @@ router.get("/me/profile", protect, getMe);
 // Obtener estadísticas de usuario
 router.get("/:id/stats", getUserStats);
 
-// Crear administrador (solo admin principal)
+// Gestión de administradores y gestores (solo admin principal)
 router.post("/admin", protect, createAdmin);
-// Obtener administrador por id (solo admin principal)
 router.get("/admin/:id", protect, getAdminById);
-// Actualizar administrador (solo admin principal)
 router.put("/admin/:id", protect, updateAdmin);
-// Eliminar administrador (solo admin principal)
 router.delete("/admin/:id", protect, deleteAdmin);
-
-// Crear gestor (solo admin)
 router.post("/gestor", protect, createGestor);
-// Listar gestores (solo admin)
 router.get("/gestor", protect, listGestores);
-// Obtener gestor por id (solo admin)
 router.get("/gestor/:id", protect, getGestorById);
-// Actualizar gestor (solo admin)
 router.put("/gestor/:id", protect, updateGestor);
-// Eliminar gestor (solo admin)
 router.delete("/gestor/:id", protect, deleteGestor);
 
+// Exporta el router de usuario
 module.exports = router;

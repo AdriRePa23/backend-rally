@@ -1,6 +1,8 @@
+// Modelo de Rally: gestiona operaciones sobre la tabla 'rallies'
 const pool = require("../config/db");
 
 const Rally = {
+  // Crea un nuevo rally
   create: async (data) => {
     const {
       nombre,
@@ -33,6 +35,7 @@ const Rally = {
     }
   },
 
+  // Obtiene todos los rallies
   findAll: async () => {
     try {
       const [rows] = await pool.query("SELECT * FROM rallies");
@@ -43,6 +46,7 @@ const Rally = {
     }
   },
 
+  // Obtiene todos los rallies con su primera imagen publicada
   findAllWithImages: async () => {
     // Obtener todos los rallies
     const [rallies] = await pool.query("SELECT * FROM rallies");
@@ -74,6 +78,7 @@ const Rally = {
     return ralliesConImagen;
   },
 
+  // Busca rally por ID
   findById: async (id) => {
     try {
       const [rows] = await pool.query("SELECT * FROM rallies WHERE id = ?", [id]);
@@ -84,6 +89,7 @@ const Rally = {
     }
   },
 
+  // Actualiza datos de un rally
   update: async (id, data) => {
     const {
       nombre,
@@ -114,6 +120,7 @@ const Rally = {
     }
   },
 
+  // Elimina un rally
   delete: async (id) => {
     try {
       await pool.query("DELETE FROM rallies WHERE id = ?", [id]);
@@ -123,6 +130,7 @@ const Rally = {
     }
   },
 
+  // Obtiene todos los rallies creados por un usuario
   findAllByUsuarioId: async (usuario_id) => {
     try {
       const [rows] = await pool.query("SELECT * FROM rallies WHERE creador_id = ?", [usuario_id]);
@@ -133,7 +141,7 @@ const Rally = {
     }
   },
 
-  // Buscar rallies por nombre (LIKE)
+  // Busca rallies por nombre (LIKE)
   findByNombreLike: async (nombre) => {
     try {
       const [rows] = await pool.query(
@@ -148,4 +156,5 @@ const Rally = {
   },
 };
 
+// Exporta el modelo de rally
 module.exports = Rally;

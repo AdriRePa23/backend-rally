@@ -1,6 +1,8 @@
+// Modelo de Votación: gestiona votos sobre publicaciones
 const pool = require("../config/db");
 
 const Votacion = {
+    // Crea un nuevo voto
     create: async (data) => {
         const { ip, publicacion_id, usuario_id } = data;
         try {
@@ -15,6 +17,7 @@ const Votacion = {
         }
     },
 
+    // Busca voto por usuario y publicación
     findByUserAndPublicacion: async (usuario_id, publicacion_id) => {
         try {
             const [rows] = await pool.query(
@@ -28,6 +31,7 @@ const Votacion = {
         }
     },
 
+    // Busca voto por IP y publicación
     findByIpAndPublicacion: async (ip, publicacion_id) => {
         try {
             const [rows] = await pool.query(
@@ -41,6 +45,7 @@ const Votacion = {
         }
     },
 
+    // Obtiene todos los votos de una publicación
     findByPublicacionId: async (publicacion_id) => {
         try {
             const [rows] = await pool.query("SELECT * FROM votaciones WHERE publicacion_id = ?", [publicacion_id]);
@@ -51,6 +56,7 @@ const Votacion = {
         }
     },
 
+    // Elimina un voto por ID
     delete: async (id) => {
         try {
             const [result] = await pool.query("DELETE FROM votaciones WHERE id = ?", [id]);
@@ -62,4 +68,5 @@ const Votacion = {
     },
 };
 
+// Exporta el modelo de votación
 module.exports = Votacion;

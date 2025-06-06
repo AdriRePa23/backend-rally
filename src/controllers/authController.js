@@ -1,9 +1,11 @@
+// Controlador de autenticación y registro de usuarios
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const Usuario = require("../models/Usuario");
 const sendEmail = require("../config/sendgrid");
 const crypto = require("crypto");
 
+// Registrar un nuevo usuario y enviar email de verificación
 const registerUser = async (req, res) => {
     const { nombre, email, password } = req.body;
 
@@ -51,11 +53,11 @@ const registerUser = async (req, res) => {
 
         res.status(201).json({ message: "Usuario registrado correctamente. Revisa tu correo para verificar tu cuenta." });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Error al registrar el usuario" });
     }
 };
 
+// Iniciar sesión de usuario
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -90,6 +92,7 @@ const loginUser = async (req, res) => {
     }
 };
 
+// Middleware para verificar el token JWT
 const verifyToken = (req, res, next) => {
     const token = req.headers["authorization"]?.split(" ")[1];
 
@@ -120,7 +123,6 @@ const resendVerification = async (req, res) => {
         if (user.verificado) {
             return res.status(400).json({ message: "El usuario ya está verificado" });
         }
-        const jwt = require("jsonwebtoken");
         const verificationToken = jwt.sign(
             { id: user.id, email: user.email },
             process.env.JWT_SECRET,
@@ -168,7 +170,7 @@ const requestPasswordReset = async (req, res) => {
     }
 };
 
-// Restablecer contraseña
+// Restablecer contraseña usando token
 const resetPassword = async (req, res) => {
     const { token } = req.query;
     const { nuevaContrasena } = req.body;
@@ -184,7 +186,6 @@ const resetPassword = async (req, res) => {
             delete global.passwordResetTokens[token];
             return res.status(400).json({ message: "Token expirado" });
         }
-        const bcrypt = require("bcrypt");
         const hashed = await bcrypt.hash(nuevaContrasena, 10);
         await Usuario.updatePassword(userId, { contrasena: hashed });
         delete global.passwordResetTokens[token];
@@ -194,12 +195,9 @@ const resetPassword = async (req, res) => {
     }
 };
 
-// Verificar email (mover lógica aquí desde la ruta)
+// Verificar email de usuario usando token
 const verifyEmail = async (req, res) => {
     const { token } = req.query;
-    const path = require("path");
-    const jwt = require("jsonwebtoken");
-    const Usuario = require("../models/Usuario");
     if (!token) {
         return res.status(400).json({ message: "Token expirado o invalido" });
     }
@@ -210,10 +208,10 @@ const verifyEmail = async (req, res) => {
         await Usuario.update(decoded.id, { verificado: 1 });
         res.status(200).json({ message: "Cuenta verificada correctamente" });
     } catch (error) {
-        console.error(error);
-        return res.status(400).json({ message: error.message || "Token expirado o invalido" });
+        res.status(400).json({ message: error.message || "Token expirado o invalido" });
     }
 };
 
+// Exportar todas las funciones del controlador
 module.exports = { registerUser, loginUser, verifyToken, resendVerification, requestPasswordReset, resetPassword, verifyEmail };
 

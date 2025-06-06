@@ -16,9 +16,9 @@ const app = express();
 
 const allowedOrigins = [
     'http://localhost:5173', // Desarrollo
-    process.env.FRONTEND_URL, // Producción (debe estar definida en .env)
+    process.env.FRONTEND_URL, // Producción
     'https://picmetogether.vercel.app' // Dominio de Vercel
-].filter(Boolean); // Elimina undefined/null
+].filter(Boolean); 
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -66,9 +66,13 @@ app.get("/", (req, res) => {
     res.send("¡Bienvenido a la API del Rally Fotográfico!");
 });
 
+// Middleware de manejo de errores
 app.use(require("./middlewares/errorHandler"));
 
+
+// Definir el puerto
 const PORT = process.env.PORT || 3000;
+// Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

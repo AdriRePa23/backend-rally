@@ -1,10 +1,11 @@
+// Controlador de usuarios
 const Usuario = require("../models/Usuario");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
 const pool = require("../config/db");
 
-// Obtener información de un usuario por ID (pública)
+// Obtener información pública de un usuario por ID
 const getUserById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -21,7 +22,7 @@ const getUserById = async (req, res) => {
     }
 };
 
-// Obtener toda la información privada de un usuario (solo dueño, admin o gestor)
+// Obtener información privada de un usuario (solo dueño, admin o gestor)
 const getUserPrivateInfo = async (req, res) => {
     const { id } = req.params;
     try {
@@ -40,7 +41,6 @@ const getUserPrivateInfo = async (req, res) => {
 };
 
 // Actualizar datos de un usuario (solo dueño, admin o gestor)
-// Valida permisos y unicidad de email antes de actualizar usuario
 const updateUser = async (req, res) => {
     const { id } = req.params;
     // Si viene archivo, añadirlo a data como foto_perfil
@@ -343,4 +343,5 @@ const deleteGestor = async (req, res) => {
     }
 };
 
+// Exportar todas las funciones del controlador
 module.exports = { getUserById, updateUser, deleteUser, getUserPrivateInfo, listUsers, getMe, updatePassword, getUserStats, createAdmin, createGestor, getAdminById, updateAdmin, deleteAdmin, listGestores, getGestorById, updateGestor, deleteGestor };

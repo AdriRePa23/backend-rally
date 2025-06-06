@@ -1,3 +1,4 @@
+// Controlador de rallies
 const Rally = require("../models/Rally");
 const Publicacion = require("../models/Publicacion");
 const cloudinary = require("../config/cloudinary");
@@ -29,6 +30,7 @@ const createRally = async (req, res) => {
     }
 };
 
+// Obtiene todos los rallies
 const getRallies = async (req, res) => {
     try {
         const rallies = await Rally.findAll();
@@ -39,6 +41,7 @@ const getRallies = async (req, res) => {
     }
 };
 
+// Obtiene todos los rallies con sus imágenes
 const getRalliesConImagen = async (req, res) => {
     try {
         // Llamar al método findAllWithImages para obtener todos los rallies con sus imágenes
@@ -52,6 +55,7 @@ const getRalliesConImagen = async (req, res) => {
     }
 };
 
+// Actualiza un rally existente
 const updateRally = async (req, res) => {
     const { id } = req.params;
     const { nombre, descripcion, fecha_inicio, fecha_fin, categorias, estado, cantidad_fotos_max } = req.body;
@@ -118,6 +122,7 @@ const deleteRally = async (req, res) => {
     }
 };
 
+// Obtiene un rally por su ID
 const getRallyById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -132,6 +137,7 @@ const getRallyById = async (req, res) => {
     }
 };
 
+// Obtiene todos los rallies creados por un usuario
 const getRalliesByUsuario = async (req, res) => {
     const { usuario_id } = req.params;
     try {

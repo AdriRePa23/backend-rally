@@ -1,6 +1,8 @@
+// Controlador de estadísticas
 const pool = require("../config/db");
 const Rally = require("../models/Rally");
 
+// Obtener estadísticas generales de la plataforma
 const getEstadisticas = async (req, res) => {
     try {
         // Consultar el número total de usuarios
@@ -42,7 +44,7 @@ const getEstadisticas = async (req, res) => {
     }
 };
 
-// Estadísticas de un rally (solo dueño o admin)
+// Obtener estadísticas de un rally concreto (solo dueño, admin o gestor)
 // Valida permisos y existencia de rally antes de mostrar estadísticas
 const getEstadisticasRally = async (req, res) => {
     const { id } = req.params;
@@ -84,4 +86,5 @@ const getEstadisticasRally = async (req, res) => {
     }
 };
 
+// Exportar las funciones del controlador
 module.exports = { getEstadisticas, getEstadisticasRally };

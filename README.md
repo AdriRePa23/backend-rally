@@ -129,7 +129,7 @@ CLOUDINARY_API_SECRET=...   # API Secret de Cloudinary
 SENDGRID_API_KEY=...        # API Key de SendGrid
 EMAIL_USER=...              # Email remitente para notificaciones
 
-FRONTEND_URL=http://localhost:5173 # URL permitida para CORS (frontend)
+FRONTEND_URL=... # URL permitida para CORS (frontend)
 ```
 ---
 

@@ -1,8 +1,9 @@
+// Controlador de publicaciones
 const Publicacion = require("../models/Publicacion");
 const cloudinary = require("../config/cloudinary");
 const Rally = require("../models/Rally");
 
-// Crea una publicación, sube la imagen a Cloudinary y valida el límite de fotos por usuario en el rally
+// Crear una publicación, subir imagen a Cloudinary y validar límite de fotos
 const createPublicacion = async (req, res) => {
     const { descripcion, rally_id } = req.body;
 
@@ -46,6 +47,7 @@ const createPublicacion = async (req, res) => {
     }
 };
 
+// Obtener todas las publicaciones de un rally
 const getPublicacionesByRally = async (req, res) => {
     const { rally_id } = req.query;
 
@@ -62,7 +64,7 @@ const getPublicacionesByRally = async (req, res) => {
     }
 };
 
-// Obtener publicaciones por usuario
+// Obtener todas las publicaciones de un usuario
 const getPublicacionesByUsuario = async (req, res) => {
     const { usuario_id } = req.params;
     try {
@@ -88,7 +90,7 @@ const getPublicacionesByRallyAndUsuario = async (req, res) => {
     }
 };
 
-// Obtener todas las publicaciones de un rally ordenadas por votos descendente
+// Obtener todas las publicaciones de un rally ordenadas por votos
 const getPublicacionesByRallyOrderByVotos = async (req, res) => {
     const { rally_id } = req.query;
     if (!rally_id) {
@@ -102,7 +104,7 @@ const getPublicacionesByRallyOrderByVotos = async (req, res) => {
     }
 };
 
-// Elimina la imagen de Cloudinary asociada a la publicación antes de borrar en SQL
+// Eliminar una publicación y su imagen de Cloudinary
 const deletePublicacion = async (req, res) => {
     const { id } = req.params;
     try {
@@ -139,4 +141,5 @@ const getPublicacionById = async (req, res) => {
     }
 };
 
+// Exportar las funciones del controlador
 module.exports = { createPublicacion, getPublicacionesByRally, deletePublicacion, getPublicacionesByUsuario, getPublicacionById, getPublicacionesByRallyAndUsuario, getPublicacionesByRallyOrderByVotos };

@@ -1,7 +1,8 @@
+// Controlador de comentarios
 const Comentario = require("../models/Comentario");
 const Publicacion = require("../models/Publicacion");
 
-// Valida existencia de publicación antes de crear comentario
+// Crear un comentario en una publicación
 const createComentario = async (req, res) => {
     const { publicacion_id, comentario } = req.body;
 
@@ -26,7 +27,7 @@ const createComentario = async (req, res) => {
     }
 };
 
-// Obtener comentarios de una publicación
+// Obtener todos los comentarios de una publicación
 const getComentariosByPublicacion = async (req, res) => {
     const { publicacion_id } = req.query;
 
@@ -46,7 +47,7 @@ const getComentariosByPublicacion = async (req, res) => {
     }
 };
 
-// Obtener comentarios de un usuario
+// Obtener todos los comentarios de un usuario
 const getComentariosByUsuario = async (req, res) => {
     const { usuario_id } = req.params;
     try {
@@ -58,7 +59,7 @@ const getComentariosByUsuario = async (req, res) => {
     }
 };
 
-// Valida permisos antes de eliminar comentario
+// Eliminar un comentario (con validación de permisos)
 const deleteComentario = async (req, res) => {
     const { id } = req.params;
 
@@ -94,4 +95,5 @@ const deleteComentario = async (req, res) => {
     }
 };
 
+// Exportar las funciones del controlador
 module.exports = { createComentario, getComentariosByPublicacion, deleteComentario, getComentariosByUsuario };

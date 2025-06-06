@@ -1,3 +1,4 @@
+// Rutas de rallies: crear, consultar, actualizar y eliminar rallies
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
 const { createRally, updateRally, deleteRally, getRallies, getRalliesConImagen, getRallyById, getRalliesByUsuario } = require("../controllers/rallyController");
@@ -5,7 +6,7 @@ const { check, validationResult } = require("express-validator");
 
 const router = express.Router();
 
-// Crear un rally
+// Crear un rally (requiere autenticación y validación de datos)
 router.post(
     "/",
     protect,
@@ -46,7 +47,7 @@ router.post(
 // Listar todos los rallies
 router.get("/", getRallies);
 
-// Listar todos los rallies con imagen mas votada
+// Listar todos los rallies con imagen más votada
 router.get("/card", getRalliesConImagen);
 
 // Obtener información de un rally por ID
@@ -55,7 +56,7 @@ router.get("/:id", getRallyById);
 // Obtener rallies creados por un usuario
 router.get("/usuario/:usuario_id", getRalliesByUsuario);
 
-// Buscar rallies por nombre (búsqueda parcial, LIKE)
+// Buscar rallies por nombre (LIKE)
 router.get("/buscar/nombre/:nombre", async (req, res) => {
     const { nombre } = req.params;
     try {
@@ -66,7 +67,7 @@ router.get("/buscar/nombre/:nombre", async (req, res) => {
     }
 });
 
-// Actualizar un rally
+// Actualizar un rally (requiere autenticación)
 router.put(
     "/:id",
     protect,
@@ -90,7 +91,7 @@ router.put(
     updateRally
 );
 
-// Eliminar un rally
+// Eliminar un rally (requiere autenticación)
 router.delete(
     "/:id",
     protect,
@@ -107,4 +108,5 @@ router.delete(
     deleteRally
 );
 
+// Exporta el router de rallies
 module.exports = router;

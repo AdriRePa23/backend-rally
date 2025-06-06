@@ -1,3 +1,4 @@
+// Rutas de comentarios: crear, consultar y eliminar comentarios
 const express = require("express");
 const { protect } = require("../middlewares/authMiddleware");
 const { createComentario, getComentariosByPublicacion, deleteComentario, getComentariosByUsuario } = require("../controllers/comentarioController");
@@ -5,7 +6,7 @@ const { check, validationResult } = require("express-validator");
 
 const router = express.Router();
 
-// Crear un comentario
+// Crear un comentario (requiere autenticación y validación)
 router.post(
     "/",
     protect,
@@ -46,7 +47,7 @@ router.get(
 // Obtener comentarios de un usuario
 router.get("/usuario/:usuario_id", getComentariosByUsuario);
 
-// Eliminar un comentario
+// Eliminar un comentario (requiere autenticación)
 router.delete(
     "/:id",
     protect,
@@ -63,4 +64,5 @@ router.delete(
     deleteComentario
 );
 
+// Exporta el router de comentarios
 module.exports = router;

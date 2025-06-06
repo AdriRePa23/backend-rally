@@ -1,6 +1,8 @@
+// Modelo de Comentario: gestiona operaciones sobre la tabla 'comentarios'
 const pool = require("../config/db");
 
 const Comentario = {
+    // Crea un nuevo comentario
     create: async (data) => {
         const { usuario_id, publicacion_id, comentario } = data;
         try {
@@ -15,6 +17,7 @@ const Comentario = {
         }
     },
 
+    // Obtiene todos los comentarios de una publicación
     findAllByPublicacionId: async (publicacion_id) => {
         try {
             const [rows] = await pool.query(
@@ -38,6 +41,7 @@ const Comentario = {
         }
     },
 
+    // Obtiene todos los comentarios de un usuario
     findAllByUsuarioId: async (usuario_id) => {
         try {
             const [rows] = await pool.query(
@@ -55,6 +59,7 @@ const Comentario = {
         }
     },
 
+    // Busca comentario por ID
     findById: async (id) => {
         try {
             const [rows] = await pool.query("SELECT * FROM comentarios WHERE id = ?", [id]);
@@ -65,6 +70,7 @@ const Comentario = {
         }
     },
 
+    // Elimina un comentario
     delete: async (id) => {
         try {
             await pool.query("DELETE FROM comentarios WHERE id = ?", [id]);
@@ -75,4 +81,5 @@ const Comentario = {
     },
 };
 
+// Exporta el modelo de comentario
 module.exports = Comentario;
