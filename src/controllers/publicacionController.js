@@ -41,8 +41,8 @@ const createPublicacion = async (req, res) => {
 
         res.status(201).json({ message: "Publicación creada correctamente", publicacionId });
     } catch (error) {
-        // No log de error en producción para evitar fuga de información
-        res.status(500).json({ message: "Error al crear la publicación" });
+        
+        res.status(500).json({ message: "Error al crear la publicación" + error.message });
     }
 };
 

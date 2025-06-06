@@ -16,12 +16,16 @@ const app = express();
 
 const allowedOrigins = [
     'http://localhost:5173', // Desarrollo
-    process.env.FRONTEND_URL // Producción (debe estar definida en .env)
-];
+    process.env.FRONTEND_URL, // Producción (debe estar definida en .env)
+    'https://picmetogether.vercel.app' // Dominio de Vercel
+].filter(Boolean); // Elimina undefined/null
+
 app.use(cors({
     origin: function (origin, callback) {
-        // Permitir peticiones sin origen (como Postman) o si está en la lista
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin) return callback(null, true); // Permitir Postman y llamadas internas
+        // Permitir localhost y cualquier subdominio de picmetogether.vercel.app
+        const allowed = /^https?:\/\/(localhost:5173|([a-z0-9-]+\.)?picmetogether\.vercel\.app)$/i;
+        if (allowed.test(origin)) {
             callback(null, true);
         } else {
             callback(new Error('No permitido por CORS'));
@@ -30,7 +34,11 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json());
+// Responder a preflight OPTIONS para todas las rutas
+app.options('*', cors());
+
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(helmet());
 
 // Rutas de autenticación
